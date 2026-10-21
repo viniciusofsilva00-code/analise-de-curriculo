@@ -196,7 +196,8 @@ def test_conexao_ia_so_no_site(pagina):
     page = pagina.page
     page.goto(site.as_uri())
     opcoes = page.eval_on_selector_all("#ia-provedor option", "os => os.map(o => o.value)")
-    assert opcoes == ["", "anthropic", "openai", "google"]
+    assert opcoes == ["", "anthropic", "openai", "google", "cloudflare"]
+    assert page.is_hidden("#ia-conta-box")
     page.select_option("#ia-provedor", "anthropic")
     assert page.input_value("#ia-modelo") == "claude-sonnet-5-5"
     page.fill("#ia-chave", "sk-ant-teste-123")
@@ -210,6 +211,14 @@ def test_conexao_ia_so_no_site(pagina):
     assert "sk-ant-teste-123" not in page.evaluate("localStorage.getItem('analise-curriculos-conexao-ia-v1')")
     page.select_option("#ia-provedor", "google")
     assert page.input_value("#ia-modelo") == ""
+    # Cloudflare pede Account ID + API token
+    page.select_option("#ia-provedor", "cloudflare")
+    assert page.is_visible("#ia-conta-box") and page.inner_text("#ia-chave-rotulo") == "API token (Workers AI)"
+    page.fill("#ia-modelo", "@cf/modelo-teste")
+    page.fill("#ia-conta", "0123456789abcdef0123456789abcdef")
+    page.fill("#ia-chave", "token-cf")
+    assert "selecionado" in page.inner_text("#ia-status")
+    assert page.evaluate("ConexaoIA.get()") == {"provedor": "cloudflare", "modelo": "@cf/modelo-teste", "temChave": True, "conta": "0123456789abcdef0123456789abcdef"}
     # a chave nunca entra no processo.json exportado
     page.fill("#ia-chave", "chave-secreta-xyz")
     page.fill("#imp-txt", FIXTURE.read_text(encoding="utf-8"))
