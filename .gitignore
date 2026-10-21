@@ -1,0 +1,9 @@
+# ambiente e caches
+.venv/
+.pytest_cache/
+__pycache__/
+*.pyc
+
+# resultados de processos seletivos têm nomes e trechos de currículos: nunca versionar
+exemplos/
+_resultado/

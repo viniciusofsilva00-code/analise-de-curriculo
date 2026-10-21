@@ -1,0 +1,998 @@
+{
+  "schemaVersion": "1.0",
+  "geradoPor": "fixture (painel aprovado)",
+  "vaga": {
+    "id": "nexora-analista-rh-2026-10-20",
+    "titulo": "Analista de Recursos Humanos — Nexora Soluções Empresariais",
+    "cargo": "Analista de Recursos Humanos",
+    "empresa": "Nexora Soluções Empresariais",
+    "area": "Gente & Gestão | Recursos Humanos",
+    "local": "São Paulo, SP",
+    "modelo": "hibrido",
+    "contrato": "CLT · integral",
+    "faixa": "R$ 3.800–5.200",
+    "data": "2026-10-20",
+    "exigePresenca": true,
+    "afirmativa": "",
+    "fonteRequisitos": "Requisitos tirados do anúncio da Nexora."
+  },
+  "criterios": [
+    {
+      "id": "C1",
+      "nome": "Graduação em Administração, Psicologia, Gestão de RH ou correlata",
+      "tipo": "O",
+      "peso": 10
+    },
+    {
+      "id": "C2",
+      "nome": "Mínimo 2 anos em RH (tempo, nível e recência)",
+      "tipo": "O",
+      "peso": 15
+    },
+    {
+      "id": "C3",
+      "nome": "Excel intermediário (tabela dinâmica, gráficos, fórmulas)",
+      "tipo": "O",
+      "peso": 10
+    },
+    {
+      "id": "C4",
+      "nome": "R&S com condução de entrevistas por competências",
+      "tipo": "O",
+      "peso": 20
+    },
+    {
+      "id": "C5",
+      "nome": "Vivência em LNT e aplicação de treinamentos",
+      "tipo": "O",
+      "peso": 15
+    },
+    {
+      "id": "C6",
+      "nome": "Pós/MBA em Gestão de Pessoas, RH Estratégico ou afins",
+      "tipo": "D",
+      "peso": 5
+    },
+    {
+      "id": "C7",
+      "nome": "DISC, MBTI ou mapeamento comportamental",
+      "tipo": "D",
+      "peso": 4
+    },
+    {
+      "id": "C8",
+      "nome": "ATS (LinkedIn Recruiter, Gupy, Kenoby ou similar)",
+      "tipo": "D",
+      "peso": 4
+    },
+    {
+      "id": "C9",
+      "nome": "Inglês intermediário",
+      "tipo": "D",
+      "peso": 4
+    },
+    {
+      "id": "C10",
+      "nome": "Certificação em coaching ou gestão de conflitos",
+      "tipo": "D",
+      "peso": 3
+    },
+    {
+      "id": "C11",
+      "nome": "OKRs aplicados a RH",
+      "tipo": "D",
+      "peso": 2
+    },
+    {
+      "id": "C12",
+      "nome": "Responsabilidades da vaga: clima, indicadores, desempenho, desligamento",
+      "tipo": "D",
+      "peso": 8
+    }
+  ],
+  "candidatos": [
+    {
+      "id": "juliana",
+      "nome": "Juliana Ferreira Costa",
+      "arquivo": "01_curriculo_juliana_ferreira_costa.pdf",
+      "cidade": "São Paulo, SP",
+      "cargo": "Analista de RH Sênior · Groupe Solaris Cosméticos",
+      "status": "aprovado",
+      "ordemRecencia": 1,
+      "notas": {
+        "C1": {
+          "nota": 5,
+          "trecho": "Bacharelado em Psicologia — Universidade Mackenzie — 2018",
+          "natureza": "escrito"
+        },
+        "C2": {
+          "nota": 5,
+          "trecho": "Analista de RH Sênior … Jan/2021 – Atual; Assistente de RH … Mar/2018 – Dez/2020",
+          "natureza": "escrito"
+        },
+        "C3": {
+          "nota": 4,
+          "trecho": "Excel Avançado (declarado) + Controle e análise de indicadores: turnover, absenteísmo, headcount",
+          "natureza": "escrito"
+        },
+        "C4": {
+          "nota": 4,
+          "trecho": "Coordenação de 40+ processos seletivos/ano (analista a gerência)",
+          "natureza": "escrito",
+          "comentario": "método por competências não citado"
+        },
+        "C5": {
+          "nota": 4,
+          "trecho": "Apoio em treinamentos e aplicação de LNT (2018–2020) + Desenvolvimento de programa de onboarding",
+          "natureza": "escrito"
+        },
+        "C6": {
+          "nota": 5,
+          "trecho": "MBA em Gestão de Pessoas — FIA Business School — 2022",
+          "natureza": "escrito"
+        },
+        "C7": {
+          "nota": 5,
+          "trecho": "Certificação DISC Analyst — The Predictive Index (2022)",
+          "natureza": "escrito"
+        },
+        "C8": {
+          "nota": 3,
+          "trecho": "Gupy (ATS)",
+          "natureza": "declarado",
+          "comentario": "só na lista de habilidades: declarada, não evidenciada"
+        },
+        "C9": {
+          "nota": 4,
+          "trecho": "Inglês: Intermediário",
+          "natureza": "escrito",
+          "comentario": "autodeclarado"
+        },
+        "C10": {
+          "nota": 0,
+          "trecho": "Sem menção",
+          "natureza": "ausente"
+        },
+        "C11": {
+          "nota": 0,
+          "trecho": "Sem menção",
+          "natureza": "ausente"
+        },
+        "C12": {
+          "nota": 4,
+          "trecho": "Implantação de pesquisa de clima com 87% de adesão; onboarding; indicadores",
+          "natureza": "escrito",
+          "comentario": "sem desempenho/desligamento"
+        }
+      },
+      "fortes": [
+        {
+          "texto": "R&S em volume e em vários níveis",
+          "trecho": "Coordenação de 40+ processos seletivos/ano (analista a gerência)"
+        },
+        {
+          "texto": "Clima com resultado mensurado",
+          "trecho": "Implantação de pesquisa de clima com 87% de adesão"
+        },
+        {
+          "texto": "Onboarding e indicadores com número",
+          "trecho": "Desenvolvimento de programa de onboarding — redução de 30% no tempo de integração"
+        }
+      ],
+      "riscos": [
+        {
+          "texto": "LNT e treinamentos só aparecem no cargo de assistente (2018–2020); não há evidência recente de T&D",
+          "trecho": "Apoio em treinamentos e aplicação de LNT",
+          "inferencia": false
+        },
+        {
+          "texto": "Título Sênior contra faixa de R$ 3.800–5.200 do anúncio: risco de desalinhamento de expectativa salarial (inferência, o CV não traz salário)",
+          "trecho": "Analista de RH Sênior",
+          "inferencia": true
+        }
+      ],
+      "inconsistencias": [
+        {
+          "texto": "Salto de Assistente (Dez/2020) para Analista Sênior (Jan/2021) com troca de empresa: validar escopo real do cargo.",
+          "inferencia": false
+        },
+        {
+          "texto": "30% de redução no tempo de integração e 87% de adesão sem base (de quanto para quanto, quantas pessoas).",
+          "inferencia": false
+        },
+        {
+          "texto": "Coordenar 40+ processos não diz se ela conduzia as entrevistas nem o método.",
+          "inferencia": false
+        },
+        {
+          "texto": "Certificação DISC emitida por The Predictive Index: o PI tem metodologia própria, diferente do DISC (inferência minha). Pedir o certificado.",
+          "inferencia": true
+        }
+      ]
+    },
+    {
+      "id": "anderson",
+      "nome": "Anderson Costa Ferreira",
+      "arquivo": "07_curriculo_anderson_costa_ferreira.pdf",
+      "cidade": "Osasco, SP",
+      "cargo": "Analista de RH · Supermercados Bom Preço (até Nov/2022)",
+      "status": "aprovado",
+      "ordemRecencia": 5,
+      "notas": {
+        "C1": {
+          "nota": 5,
+          "trecho": "Bacharelado em Administração — Universidade Metodista de São Paulo — 2015",
+          "natureza": "escrito"
+        },
+        "C2": {
+          "nota": 4,
+          "trecho": "Analista de RH … Fev/2016 – Nov/2022",
+          "natureza": "escrito",
+          "comentario": "sem atuação em RH registrada desde Nov/2022"
+        },
+        "C3": {
+          "nota": 4,
+          "trecho": "Excel Avançado + Elaboração de relatórios de turnover e absenteísmo para a diretoria",
+          "natureza": "escrito"
+        },
+        "C4": {
+          "nota": 4,
+          "trecho": "Recrutamento e seleção para 12 lojas (operacional, supervisão e coordenação)",
+          "natureza": "escrito",
+          "comentario": "método não citado"
+        },
+        "C5": {
+          "nota": 2,
+          "trecho": "7 anos de experiência em R&S, T&D (objetivo)",
+          "natureza": "declarado",
+          "comentario": "nenhum item de LNT ou treinamento nas experiências: declarada, não evidenciada"
+        },
+        "C6": {
+          "nota": 5,
+          "trecho": "Especialização em Gestão de Pessoas — SENAC — 2017 — 360 horas",
+          "natureza": "escrito"
+        },
+        "C7": {
+          "nota": 0,
+          "trecho": "Sem menção",
+          "natureza": "ausente"
+        },
+        "C8": {
+          "nota": 3,
+          "trecho": "Gupy",
+          "natureza": "declarado",
+          "comentario": "só na lista de habilidades: declarada, não evidenciada"
+        },
+        "C9": {
+          "nota": 1,
+          "trecho": "Inglês: Básico",
+          "natureza": "escrito"
+        },
+        "C10": {
+          "nota": 5,
+          "trecho": "Coaching Executivo — ICF (International Coaching Federation, 2024)",
+          "natureza": "escrito"
+        },
+        "C11": {
+          "nota": 0,
+          "trecho": "Sem menção",
+          "natureza": "ausente"
+        },
+        "C12": {
+          "nota": 4,
+          "trecho": "Aplicação e análise de avaliações de desempenho semestrais; relatórios de turnover e absenteísmo",
+          "natureza": "escrito"
+        }
+      },
+      "fortes": [
+        {
+          "texto": "R&S multinível em operação de varejo",
+          "trecho": "Recrutamento e seleção para 12 lojas (operacional, supervisão e coordenação)"
+        },
+        {
+          "texto": "Indicadores levados à diretoria",
+          "trecho": "Elaboração de relatórios de turnover e absenteísmo para a diretoria"
+        },
+        {
+          "texto": "Desempenho e programa estruturado",
+          "trecho": "Aplicação e análise de avaliações de desempenho semestrais; Gestão do programa de jovem aprendiz (80 jovens/ciclo)"
+        }
+      ],
+      "riscos": [
+        {
+          "texto": "T&D aparece só no título e no objetivo; nenhuma experiência descreve LNT ou treinamento aplicado",
+          "trecho": "7 anos de experiência em R&S, T&D",
+          "inferencia": false
+        },
+        {
+          "texto": "Recência: último cargo em RH terminou em Nov/2022 e o CV não descreve atividade de Jan/2025 até hoje",
+          "trecho": "Período Sabático | Nov/2022 – Dez/2024",
+          "inferencia": false
+        }
+      ],
+      "inconsistencias": [
+        {
+          "texto": "Declara 7 anos de experiência; Fev/2016–Nov/2022 somam 6 anos e 9 meses.",
+          "inferencia": false
+        },
+        {
+          "texto": "Jan/2025 até hoje (cerca de 22 meses) sem registro no CV.",
+          "inferencia": false
+        },
+        {
+          "texto": "Coaching ICF: a ICF credencia programas e emite credenciais (ACC/PCC). Confirmar qual dos dois (inferência minha).",
+          "inferencia": true
+        },
+        {
+          "texto": "Resultados sem número: avaliações e relatórios sem impacto descrito.",
+          "inferencia": false
+        }
+      ]
+    },
+    {
+      "id": "gabriel",
+      "nome": "Gabriel Henrique Marques",
+      "arquivo": "09_curriculo_gabriel_henrique_marques.pdf",
+      "cidade": "São Paulo, SP",
+      "cargo": "Analista de RH — D&I · Grupo Plural",
+      "status": "aprovado",
+      "ordemRecencia": 2,
+      "notas": {
+        "C1": {
+          "nota": 5,
+          "trecho": "Bacharelado em Psicologia — PUC-SP — 2020",
+          "natureza": "escrito"
+        },
+        "C2": {
+          "nota": 5,
+          "trecho": "Analista de RH — D&I … Mar/2021 – Atual",
+          "natureza": "escrito"
+        },
+        "C3": {
+          "nota": 3,
+          "trecho": "Excel Intermediário",
+          "natureza": "declarado",
+          "comentario": "só na lista de habilidades"
+        },
+        "C4": {
+          "nota": 3,
+          "trecho": "Estruturação do programa de contratação … (cota Lei 8.213); Apoio em processos seletivos (estágio)",
+          "natureza": "escrito",
+          "comentario": "entrevistas não descritas"
+        },
+        "C5": {
+          "nota": 3,
+          "trecho": "Treinamentos sobre vieses inconscientes para 240 líderes",
+          "natureza": "escrito",
+          "comentario": "aplicação evidenciada, LNT não citada"
+        },
+        "C6": {
+          "nota": 4,
+          "trecho": "Pós-Graduação em Diversidade e Inclusão nas Organizações — FIA",
+          "natureza": "escrito",
+          "comentario": "2022 (afim)"
+        },
+        "C7": {
+          "nota": 0,
+          "trecho": "Sem menção",
+          "natureza": "ausente"
+        },
+        "C8": {
+          "nota": 3,
+          "trecho": "Kenoby (ATS)",
+          "natureza": "declarado",
+          "comentario": "só na lista de habilidades"
+        },
+        "C9": {
+          "nota": 4,
+          "trecho": "Inglês: Intermediário",
+          "natureza": "escrito",
+          "comentario": "autodeclarado"
+        },
+        "C10": {
+          "nota": 0,
+          "trecho": "Sem menção",
+          "natureza": "ausente"
+        },
+        "C11": {
+          "nota": 0,
+          "trecho": "Sem menção",
+          "natureza": "ausente"
+        },
+        "C12": {
+          "nota": 2,
+          "trecho": "Participação na aplicação de avaliação de desempenho 180° (estágio)",
+          "natureza": "escrito"
+        }
+      },
+      "fortes": [
+        {
+          "texto": "Treinamento aplicado em escala",
+          "trecho": "Treinamentos sobre vieses inconscientes para 240 líderes"
+        },
+        {
+          "texto": "Estruturou um programa de contratação com parceiros externos",
+          "trecho": "Estruturação do programa de contratação … (cota Lei 8.213); Parceria com entidades de inclusão"
+        },
+        {
+          "texto": "Formação aderente e atuação recente como analista",
+          "trecho": "Bacharelado em Psicologia — PUC-SP; Analista de RH … Mar/2021 – Atual"
+        }
+      ],
+      "riscos": [
+        {
+          "texto": "R&S generalista pouco evidenciado: atuação concentrada em um programa específico; entrevistas por competências não aparecem",
+          "trecho": "Estruturação do programa de contratação inclusiva",
+          "inferencia": false
+        },
+        {
+          "texto": "Sem evidência de clima, indicadores ou LNT; Excel só declarado",
+          "trecho": "Excel Intermediário",
+          "inferencia": false
+        }
+      ],
+      "inconsistencias": [
+        {
+          "texto": "Formado em 2020 e estagiário até Fev/2021: estágio exige matrícula ativa (Lei 11.788/2008). Validar datas.",
+          "inferencia": false
+        },
+        {
+          "texto": "Resultados sem número: quantas contratações, retenção, avaliação dos treinamentos.",
+          "inferencia": false
+        },
+        {
+          "texto": "Treinamento para 240 líderes: desenhou e facilitou ou coordenou consultoria externa?",
+          "inferencia": false
+        }
+      ]
+    },
+    {
+      "id": "fernanda",
+      "nome": "Fernanda Lopes Carvalho",
+      "arquivo": "05_curriculo_fernanda_lopes_carvalho.pdf",
+      "cidade": "São Bernardo do Campo, SP",
+      "cargo": "Analista de RH Pleno · Frigorífico Santa Maria",
+      "status": "aprovado",
+      "ordemRecencia": 3,
+      "notas": {
+        "C1": {
+          "nota": 5,
+          "trecho": "Tecnólogo em Gestão de Recursos Humanos — FATEC — 2017",
+          "natureza": "escrito"
+        },
+        "C2": {
+          "nota": 5,
+          "trecho": "Analista de RH Pleno … Jun/2018 – Atual",
+          "natureza": "escrito"
+        },
+        "C3": {
+          "nota": 3,
+          "trecho": "Excel Intermediário",
+          "natureza": "declarado",
+          "comentario": "só na lista de habilidades"
+        },
+        "C4": {
+          "nota": 4,
+          "trecho": "Gestão completa de R&S para 300+ colaboradores (operacional e administrativo)",
+          "natureza": "escrito",
+          "comentario": "método não citado"
+        },
+        "C5": {
+          "nota": 2,
+          "trecho": "Elaboração e controle do orçamento de T&D; programa de integração",
+          "natureza": "escrito",
+          "comentario": "LNT e aplicação não evidenciadas"
+        },
+        "C6": {
+          "nota": 4,
+          "trecho": "Especialização em Liderança e Gestão de Equipes — FGV Online",
+          "natureza": "escrito",
+          "comentario": "2020 (afim)"
+        },
+        "C7": {
+          "nota": 0,
+          "trecho": "Sem menção",
+          "natureza": "ausente"
+        },
+        "C8": {
+          "nota": 0,
+          "trecho": "Sem menção",
+          "natureza": "ausente",
+          "comentario": "Totvs Protheus e ADP Folha são sistemas de folha, não ATS"
+        },
+        "C9": {
+          "nota": 1,
+          "trecho": "Inglês: Básico",
+          "natureza": "escrito"
+        },
+        "C10": {
+          "nota": 0,
+          "trecho": "Sem menção",
+          "natureza": "ausente"
+        },
+        "C11": {
+          "nota": 0,
+          "trecho": "Sem menção",
+          "natureza": "ausente"
+        },
+        "C12": {
+          "nota": 3,
+          "trecho": "Condução de entrevistas de desligamento e análise de turnover; programa de integração",
+          "natureza": "escrito"
+        }
+      }
+    },
+    {
+      "id": "camila",
+      "nome": "Camila Rodrigues Monteiro",
+      "arquivo": "03_curriculo_camila_rodrigues_monteiro.pdf",
+      "cidade": "Santo André, SP",
+      "cargo": "Analista de T&D · Grupo Vitória Varejo",
+      "status": "aprovado",
+      "ordemRecencia": 4,
+      "notas": {
+        "C1": {
+          "nota": 3,
+          "trecho": "Bacharelado em Pedagogia — UFABC",
+          "natureza": "escrito",
+          "comentario": "2018 (considerada correlata por julgamento meu)"
+        },
+        "C2": {
+          "nota": 5,
+          "trecho": "Analista de RH Jr. … Jul/2018; Analista de T&D … Fev/2020 – Atual",
+          "natureza": "escrito"
+        },
+        "C3": {
+          "nota": 3,
+          "trecho": "Excel Intermediário",
+          "natureza": "declarado",
+          "comentario": "só na lista de habilidades"
+        },
+        "C4": {
+          "nota": 2,
+          "trecho": "Apoio em recrutamento para área administrativa e técnica (2018–2020)",
+          "natureza": "escrito"
+        },
+        "C5": {
+          "nota": 5,
+          "trecho": "Mapeamento anual de LNT para 800+ colaboradores; 25 programas de capacitação",
+          "natureza": "escrito"
+        },
+        "C6": {
+          "nota": 5,
+          "trecho": "Pós-Graduação em Gestão Estratégica de Pessoas — ESPM — 2021",
+          "natureza": "escrito"
+        },
+        "C7": {
+          "nota": 0,
+          "trecho": "Sem menção",
+          "natureza": "ausente"
+        },
+        "C8": {
+          "nota": 0,
+          "trecho": "Sem menção",
+          "natureza": "ausente"
+        },
+        "C9": {
+          "nota": 4,
+          "trecho": "Inglês: Intermediário (B1)",
+          "natureza": "escrito"
+        },
+        "C10": {
+          "nota": 0,
+          "trecho": "Sem menção",
+          "natureza": "ausente",
+          "comentario": "Facilitação de Aprendizagem não é coaching nem gestão de conflitos"
+        },
+        "C11": {
+          "nota": 0,
+          "trecho": "Sem menção",
+          "natureza": "ausente"
+        },
+        "C12": {
+          "nota": 1,
+          "trecho": "Integração e onboarding de novos colaboradores",
+          "natureza": "escrito",
+          "comentario": "sem clima, indicadores ou desempenho"
+        }
+      }
+    },
+    {
+      "id": "marcos",
+      "nome": "Marcos Vinicius Almeida Santos",
+      "arquivo": "02_curriculo_marcos_vinicius_santos.pdf",
+      "cidade": "São Paulo, SP",
+      "status": "eliminado",
+      "motivo": "C5: nenhuma vivência em LNT ou treinamento. C4 também fraco: só Triagem de currículos para vagas operacionais; competências aparecem apenas como curso SENAC.",
+      "requisitosFaltantes": [
+        "C5"
+      ]
+    },
+    {
+      "id": "beatriz",
+      "nome": "Beatriz Nakamura Oliveira",
+      "arquivo": "06_curriculo_beatriz_nakamura_oliveira.pdf",
+      "cidade": "São Paulo, SP",
+      "status": "eliminado",
+      "motivo": "C2: experiência em RH é estágio de 1 ano e 9 meses (Mar/2023–Dez/2024). C3: Excel Básico.",
+      "requisitosFaltantes": [
+        "C2",
+        "C3"
+      ]
+    },
+    {
+      "id": "rodrigo",
+      "nome": "Rodrigo Tavares Mendonça",
+      "arquivo": "04_curriculo_rodrigo_tavares_mendonca.pdf",
+      "cidade": "São Paulo, SP",
+      "status": "limitrofe",
+      "motivo": "C5: sem LNT ou treinamento aplicado; Suporte a gestores em PDI não equivale. Caso limítrofe: se você aceitar PDI como vivência de T&D, ele entra na disputa.",
+      "requisitosFaltantes": [
+        "C5"
+      ],
+      "ordemRecencia": 6,
+      "criterioInclusao": "Se você aceitar “Suporte a gestores em planos de desenvolvimento individual (PDI)” como vivência de T&D, ele entra na disputa.",
+      "notas": {
+        "C1": {
+          "nota": 5,
+          "trecho": "Bacharelado em Administração",
+          "natureza": "escrito"
+        },
+        "C2": {
+          "nota": 5,
+          "trecho": "HR Analyst | Sigma Tech International (Filial BR) | São Paulo, SP … Mar/2021 – Atual",
+          "natureza": "escrito"
+        },
+        "C3": {
+          "nota": 3,
+          "trecho": "Excel Avançado",
+          "natureza": "declarado"
+        },
+        "C4": {
+          "nota": 3,
+          "trecho": "Recrutamento e seleção de perfis técnicos (engenheiros, técnicos de segurança)",
+          "natureza": "escrito",
+          "comentario": "método por competências não citado"
+        },
+        "C5": {
+          "nota": 2,
+          "trecho": "Suporte a gestores em planos de desenvolvimento individual (PDI)",
+          "natureza": "escrito",
+          "comentario": "vizinho de T&D; LNT e treinamento não aparecem"
+        },
+        "C6": {
+          "nota": 5,
+          "trecho": "MBA em RH Estratégico",
+          "natureza": "escrito"
+        },
+        "C7": {
+          "nota": 0,
+          "trecho": "Sem menção",
+          "natureza": "ausente"
+        },
+        "C8": {
+          "nota": 3,
+          "trecho": "LinkedIn Recruiter",
+          "natureza": "declarado"
+        },
+        "C9": {
+          "nota": 5,
+          "trecho": "Inglês: Avançado (C1)",
+          "natureza": "escrito"
+        },
+        "C10": {
+          "nota": 0,
+          "trecho": "Sem menção",
+          "natureza": "ausente"
+        },
+        "C11": {
+          "nota": 0,
+          "trecho": "Sem menção",
+          "natureza": "ausente"
+        },
+        "C12": {
+          "nota": 4,
+          "trecho": "Condução de ciclos de avaliação de desempenho com metodologia 9-box",
+          "natureza": "escrito"
+        }
+      }
+    },
+    {
+      "id": "larissa",
+      "nome": "Larissa Pimentel Souza",
+      "arquivo": "08_curriculo_larissa_pimentel_souza.pdf",
+      "cidade": "São Paulo, SP",
+      "status": "eliminado",
+      "motivo": "C5: sem LNT ou treinamento. C1 duvidoso: Ciências Sociais como correlata.",
+      "requisitosFaltantes": [
+        "C5"
+      ]
+    },
+    {
+      "id": "patricia",
+      "nome": "Patrícia Souza Drummond",
+      "arquivo": "10_curriculo_patricia_souza_drummond.pdf",
+      "cidade": "São Paulo, SP",
+      "status": "eliminado",
+      "motivo": "C5: sem LNT ou treinamento; perfil voltado a relações sindicais e indústria. R&S só técnico.",
+      "requisitosFaltantes": [
+        "C5"
+      ]
+    }
+  ],
+  "top3": [
+    "juliana",
+    "anderson",
+    "gabriel"
+  ],
+  "avisos": [
+    "Margem do 3º (Gabriel Henrique Marques, 64,8) para o 4º (Fernanda Lopes Carvalho, 62,6) é de 2,2 ponto(s), menor que 3.",
+    "3º (Gabriel Henrique Marques) e 4º (Fernanda Lopes Carvalho) empatam na soma dos obrigatórios (19)."
+  ],
+  "perguntas": {
+    "comuns": [
+      {
+        "id": "B1",
+        "crit": "C4",
+        "q": "Caso: o gestor de Vendas precisa de um Analista Comercial. Em 10 minutos, defina 3 competências-chave, 1 pergunta por competência e o critério de decisão.",
+        "a1": "Requisitos genéricos e perguntas hipotéticas (o que você faria).",
+        "a3": "Competências coerentes e perguntas comportamentais, mas critério de decisão vago.",
+        "a5": "Competências validadas com o gestor, perguntas no formato STAR com sondagem, scorecard e plano de devolutiva."
+      },
+      {
+        "id": "B2",
+        "crit": "C5",
+        "q": "STAR: conte um treinamento que você levou da LNT até a avaliação de resultado.",
+        "a1": "Só logística e lista de presença.",
+        "a3": "LNT e execução claras; avaliação apenas de reação.",
+        "a5": "Diagnóstico com gestores, objetivo mensurável, avaliação de aprendizagem ou comportamento (Kirkpatrick 2–3) e ajuste do programa."
+      },
+      {
+        "id": "B3",
+        "crit": "C3",
+        "q": "Caso numérico: 120 colaboradores, 9 desligamentos no trimestre, 4 deles em Operações (30 pessoas). Calcule o turnover e diga o que investigaria.",
+        "a1": "Não sabe a fórmula ou erra o cálculo.",
+        "a3": "Calcula 7,5% no geral; leitura superficial.",
+        "a5": "Calcula 7,5% geral e 13,3% em Operações, aponta a concentração, levanta hipóteses e cruza com entrevistas de saída."
+      },
+      {
+        "id": "B4",
+        "crit": "C12",
+        "q": "STAR: conte uma pesquisa de clima ou engajamento em que você transformou o resultado em ação.",
+        "a1": "Só aplicou o questionário.",
+        "a3": "Analisou e apresentou aos gestores.",
+        "a5": "Priorizou com gestores, plano com dono e prazo, mediu de novo e mostrou evolução."
+      },
+      {
+        "id": "B5",
+        "crit": "C12",
+        "q": "STAR: conte quando você discordou de um gestor sobre uma avaliação de desempenho ou uma contratação.",
+        "a1": "Cedeu sem argumentar ou impôs a posição do RH.",
+        "a3": "Argumentou com base em política interna.",
+        "a5": "Usou dados e evidências, propôs alternativa, preservou a relação e registrou a decisão."
+      },
+      {
+        "id": "B6",
+        "crit": "C12",
+        "q": "Como você conduz uma entrevista de desligamento e o que faz com os dados?",
+        "a1": "Formulário padrão sem uso posterior.",
+        "a3": "Roteiro próprio e consolidação periódica.",
+        "a5": "Roteiro, sigilo, consolidação por tema e área, devolutiva aos gestores e ligação com o turnover."
+      }
+    ],
+    "porCandidato": {
+      "juliana": {
+        "A": [
+          {
+            "id": "A1",
+            "crit": "C4",
+            "trecho": "Coordenação de 40+ processos seletivos/ano (analista a gerência)",
+            "q": "Escolha um processo de gerência recente. Qual foi o seu papel em cada etapa e como você montou a entrevista por competências?",
+            "boa": "Descreve competências definidas com o gestor, roteiro com perguntas comportamentais e sondagem, critério de decisão; separa o que ela fez do que o gestor fez.",
+            "alerta": "Fala só de triagem e agendamento, ou de coordenar sem conduzir entrevistas."
+          },
+          {
+            "id": "A2",
+            "crit": "C2",
+            "trecho": "Assistente de RH … Dez/2020 → Analista de RH Sênior … Jan/2021",
+            "q": "Como foi a entrada direto como Sênior vindo de assistente? O que caracterizava o nível sênior: autonomia, quantos gestores atendia, a quem reportava?",
+            "boa": "Escopo concreto e compatível com sênior: carteira de áreas, decisões próprias, projetos que liderou.",
+            "alerta": "Título não corresponde às atividades; atuação de assistente com outro nome."
+          },
+          {
+            "id": "A3",
+            "crit": "C12",
+            "trecho": "Implantação de pesquisa de clima com 87% de adesão",
+            "q": "Qual ferramenta, quantas pessoas elegíveis, como chegou aos 87% e qual plano de ação saiu da pesquisa?",
+            "boa": "Base de elegíveis, estratégia de comunicação, 1–2 ações implantadas com dono e prazo.",
+            "alerta": "Não lembra a base, ou a pesquisa não gerou plano de ação."
+          },
+          {
+            "id": "A4",
+            "crit": "C12",
+            "trecho": "Desenvolvimento de programa de onboarding — redução de 30% no tempo de integração",
+            "q": "De quantos para quantos dias? Como mediu e o que mudou no programa?",
+            "boa": "Linha de base, métrica definida (ex.: dias até a pessoa operar sozinha), mudança concreta no processo.",
+            "alerta": "Número sem medição ou resultado atribuído a outra pessoa."
+          },
+          {
+            "id": "A5",
+            "crit": "C5",
+            "trecho": "Apoio em treinamentos e aplicação de LNT",
+            "q": "Descreva a LNT de que participou: método, público e o que foi feito por você. Desde 2021, você conduziu algum treinamento?",
+            "boa": "Método claro (questionário, entrevista com gestores, gap de competências), priorização, treinamento conduzido por ela.",
+            "alerta": "Só tabulou formulários; nenhuma atuação em T&D desde 2021."
+          },
+          {
+            "id": "A6",
+            "crit": "C3",
+            "trecho": "Excel Avançado · Controle e análise de indicadores: turnover, absenteísmo, headcount",
+            "q": "Como você montava o relatório de turnover? Aplique o teste prático de 15 min (tabela dinâmica por área e mês + fórmula de turnover).",
+            "boa": "Fórmula de turnover correta, tabela dinâmica e gráfico montados sem ajuda.",
+            "alerta": "Depende de relatório pronto do sistema; não monta tabela dinâmica."
+          },
+          {
+            "id": "A7",
+            "crit": "C7",
+            "trecho": "Certificação DISC Analyst — The Predictive Index (2022)",
+            "q": "Qual a instituição que emitiu o certificado? Em que situação real usou DISC e quais os limites dele em seleção?",
+            "boa": "Mostra o certificado; usa o perfil como apoio à entrevista, nunca como critério eliminatório.",
+            "alerta": "Emissora não confere ou usa DISC para eliminar candidatos."
+          }
+        ],
+        "B7": {
+          "id": "B7",
+          "crit": "C11",
+          "q": "Caso: proponha 2 OKRs para a área de R&S da Nexora no próximo trimestre.",
+          "a1": "Lista tarefas ou metas vagas (melhorar seleção).",
+          "a3": "Objetivo claro e KRs mensuráveis, porém de atividade (nº de entrevistas).",
+          "a5": "KRs de resultado com linha de base: time-to-hire, aceite de oferta, retenção em 90 dias; explica como acompanharia."
+        }
+      },
+      "anderson": {
+        "A": [
+          {
+            "id": "A1",
+            "crit": "C5",
+            "trecho": "7 anos de experiência em R&S, T&D",
+            "q": "Dê um exemplo de treinamento que você diagnosticou (LNT) e aplicou nas lojas: público, conteúdo, como avaliou o resultado.",
+            "boa": "LNT feita com gestores de loja, treinamento conduzido por ele, indicador de resultado.",
+            "alerta": "T&D se resume à integração de jovens aprendizes conduzida por terceiros."
+          },
+          {
+            "id": "A2",
+            "crit": "C4",
+            "trecho": "Recrutamento e seleção para 12 lojas (operacional, supervisão e coordenação)",
+            "q": "Qual o volume médio por mês? Como a entrevista para coordenação diferia da operacional? Usava roteiro por competências?",
+            "boa": "Números concretos, roteiro por competências para liderança, participação do gestor estruturada.",
+            "alerta": "Fazia só triagem; os gestores decidiam sem estrutura."
+          },
+          {
+            "id": "A3",
+            "crit": "C2",
+            "trecho": "Período Sabático | Nov/2022 – Dez/2024 (CV sem registro a partir de Jan/2025)",
+            "q": "O que você fez profissionalmente desde Jan/2025: projetos, consultorias, cursos, processos seletivos?",
+            "boa": "Atividades concretas de atualização ou atuação, coerentes com o CV.",
+            "alerta": "Informações que não fecham com o CV. Não pergunte o motivo pessoal do afastamento; ele não entra na avaliação."
+          },
+          {
+            "id": "A4",
+            "crit": "C2",
+            "trecho": "Analista de RH com 7 anos de experiência",
+            "q": "Os 7 anos incluem alguma experiência em RH que não está no currículo?",
+            "boa": "Explica a diferença (estágio ou trabalho anterior) com datas.",
+            "alerta": "Tempo de experiência inflado."
+          },
+          {
+            "id": "A5",
+            "crit": "C12",
+            "trecho": "Aplicação e análise de avaliações de desempenho semestrais",
+            "q": "Qual metodologia, quantas pessoas, o que você analisava e que decisões saíram dos resultados?",
+            "boa": "Método, calibração com gestores, desdobramento em PDI, promoção ou desligamento.",
+            "alerta": "Só distribuía e recolhia formulários."
+          },
+          {
+            "id": "A6",
+            "crit": "C3",
+            "trecho": "Excel Avançado · Elaboração de relatórios de turnover e absenteísmo para a diretoria",
+            "q": "Como montava o relatório para a diretoria? Aplique o teste prático de 15 min.",
+            "boa": "Fórmulas corretas, tabela dinâmica e gráfico sem ajuda.",
+            "alerta": "Não reproduz o que descreve."
+          },
+          {
+            "id": "A7",
+            "crit": "C10",
+            "trecho": "Coaching Executivo — ICF (International Coaching Federation, 2024)",
+            "q": "É credencial ICF (ACC/PCC) ou curso acreditado? Quantas horas práticas? Como usaria isso em conflito com gestores?",
+            "boa": "Identifica o tipo de certificação, horas, exemplo aplicado.",
+            "alerta": "Não sabe a diferença ou não mostra o certificado."
+          },
+          {
+            "id": "A8",
+            "crit": "C8",
+            "trecho": "Gupy (lista de habilidades)",
+            "q": "O que você configurava na Gupy: etapas, testes, filtros, comunicação com candidatos?",
+            "boa": "Descreve configuração e uso diário.",
+            "alerta": "Só consultava candidatos já triados por outra pessoa."
+          }
+        ],
+        "B7": {
+          "id": "B7",
+          "crit": "C2",
+          "q": "Caso: o que mudou em R&S e em RH desde 2022 que você incorporaria aqui na Nexora no primeiro mês?",
+          "a1": "Não cita mudanças ou repete práticas de 2022.",
+          "a3": "Cita 1–2 mudanças (ex.: triagem com IA no ATS, eSocial, trabalho híbrido) sem dizer como aplicar.",
+          "a5": "Cita mudanças relevantes e propõe como aplicar, com cuidado de viés e de LGPD."
+        }
+      },
+      "gabriel": {
+        "A": [
+          {
+            "id": "A1",
+            "crit": "C4",
+            "trecho": "Estruturação do programa de contratação … (cota Lei 8.213)",
+            "q": "Quantas contratações o programa fez, quais etapas e qual o seu papel nas entrevistas? Como avaliava competências?",
+            "boa": "Números, roteiro por competências, papel ativo na decisão.",
+            "alerta": "Atuação limitada a sourcing e parcerias, sem conduzir entrevistas."
+          },
+          {
+            "id": "A2",
+            "crit": "C4",
+            "trecho": "Apoio em processos seletivos para área administrativa",
+            "q": "Fora desse programa, você conduziu processos seletivos do início ao fim? Quantos por mês?",
+            "boa": "Processos end-to-end com volume e perfis variados.",
+            "alerta": "Nunca conduziu um processo sozinho."
+          },
+          {
+            "id": "A3",
+            "crit": "C5",
+            "trecho": "Treinamentos sobre vieses inconscientes para 240 líderes",
+            "q": "Você desenhou e facilitou? Como identificou a necessidade (LNT) e como avaliou o resultado?",
+            "boa": "Diagnóstico próprio, facilitação, avaliação de reação e de aprendizagem.",
+            "alerta": "Conteúdo e facilitação de consultoria; ele só organizou."
+          },
+          {
+            "id": "A4",
+            "crit": "C2",
+            "trecho": "Bacharelado em Psicologia — PUC-SP — 2020 · Estagiário de RH | Jan/2019 – Fev/2021",
+            "q": "Como o estágio seguiu depois da formatura?",
+            "boa": "Datas explicadas (colação em 2021, erro de digitação) com documento.",
+            "alerta": "Datas não fecham."
+          },
+          {
+            "id": "A5",
+            "crit": "C12",
+            "trecho": "Participação na aplicação de avaliação de desempenho 180°",
+            "q": "Qual foi sua participação, e no cargo atual você atua em avaliação de desempenho?",
+            "boa": "Papel concreto e experiência atual.",
+            "alerta": "Só apoio logístico, sem atuação atual."
+          },
+          {
+            "id": "A6",
+            "crit": "C3",
+            "trecho": "Excel Intermediário",
+            "q": "Aplique o teste prático de 15 min (tabela dinâmica por área e mês + fórmula de turnover).",
+            "boa": "Monta sem ajuda.",
+            "alerta": "Não chega ao nível intermediário."
+          },
+          {
+            "id": "A7",
+            "crit": "C8",
+            "trecho": "Kenoby (ATS)",
+            "q": "O que você configurava no Kenoby?",
+            "boa": "Etapas, filtros, testes, comunicação.",
+            "alerta": "Uso só de consulta."
+          }
+        ],
+        "B7": {
+          "id": "B7",
+          "crit": "C4",
+          "q": "Caso: 15 vagas operacionais abertas ao mesmo tempo e só você no R&S. Como prioriza e organiza o mês?",
+          "a1": "Atende por ordem de chegada, sem critério.",
+          "a3": "Prioriza por urgência com o gestor e usa o ATS, sem números.",
+          "a5": "Prioriza por impacto e prazo, cria funil com metas por etapa, agrupa entrevistas, mantém a qualidade e comunica status aos gestores."
+        }
+      }
+    }
+  }
+}
