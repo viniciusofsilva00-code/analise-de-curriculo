@@ -177,7 +177,7 @@ def test_site_github_pages(pagina):
     """docs/index.html (GitHub Pages) é o mesmo app com esqueleto e abre em modo de teste."""
     site = RAIZ / "docs" / "index.html"
     html = site.read_text(encoding="utf-8")
-    assert html.startswith("<!doctype html>") and APP.read_text(encoding="utf-8") in html
+    assert html.startswith("<!doctype html>")
     assert (RAIZ / "docs" / ".nojekyll").exists()
     page = pagina.page
     page.goto(site.as_uri())
@@ -186,4 +186,35 @@ def test_site_github_pages(pagina):
     page.fill("#imp-txt", FIXTURE.read_text(encoding="utf-8"))
     page.click("#btn-imp-colar")
     page.wait_for_selector("#tab-juliana")
+    assert pagina.erros == []
+
+
+def test_conexao_ia_so_no_site(pagina):
+    """A seção de API (Claude/GPT/Gemini) existe só no site; a chave não persiste sem 'Lembrar'."""
+    assert "sec-conexao" not in APP.read_text(encoding="utf-8")
+    site = RAIZ / "docs" / "index.html"
+    page = pagina.page
+    page.goto(site.as_uri())
+    opcoes = page.eval_on_selector_all("#ia-provedor option", "os => os.map(o => o.value)")
+    assert opcoes == ["", "anthropic", "openai", "google"]
+    page.select_option("#ia-provedor", "anthropic")
+    assert page.input_value("#ia-modelo") == "claude-sonnet-5-5"
+    page.fill("#ia-chave", "sk-ant-teste-123")
+    assert "selecionado" in page.inner_text("#ia-status")
+    assert page.evaluate("ConexaoIA.get()") == {"provedor": "anthropic", "modelo": "claude-sonnet-5-5", "temChave": True}
+    guardado = page.evaluate("localStorage.getItem('analise-curriculos-conexao-ia-v1')")
+    assert "sk-ant-teste-123" not in guardado  # sem "Lembrar", a chave não vai para o armazenamento
+    page.check("#ia-lembrar")
+    assert "sk-ant-teste-123" in page.evaluate("localStorage.getItem('analise-curriculos-conexao-ia-v1')")
+    page.click("#ia-esquecer")
+    assert "sk-ant-teste-123" not in page.evaluate("localStorage.getItem('analise-curriculos-conexao-ia-v1')")
+    page.select_option("#ia-provedor", "google")
+    assert page.input_value("#ia-modelo") == ""
+    # a chave nunca entra no processo.json exportado
+    page.fill("#ia-chave", "chave-secreta-xyz")
+    page.fill("#imp-txt", FIXTURE.read_text(encoding="utf-8"))
+    page.click("#btn-imp-colar")
+    page.wait_for_selector("#tab-juliana")
+    page.click("#btn-export")
+    assert "chave-secreta-xyz" not in page.input_value("#io-out")
     assert pagina.erros == []

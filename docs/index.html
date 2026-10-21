@@ -130,7 +130,7 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-body);fon
 .app-intro{max-width:760px}
 .app-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .app-grid>label,.app-field{display:flex;flex-direction:column;gap:4px;font-size:13.5px;font-weight:600;min-width:0}
-.painel .app-grid input[type=text],.painel .app-field input[type=text],.painel select.app-sel{font:14px var(--f-body);padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);width:100%;min-width:0}
+.painel .app-grid input[type=text],.painel .app-grid input[type=password],.painel .app-field input[type=text],.painel select.app-sel{font:14px var(--f-body);padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);width:100%;min-width:0}
 .painel .app-field textarea{min-height:90px}
 .app-switch{display:flex;gap:8px;align-items:center;font-size:14px;font-weight:600}
 .drop{border:2px dashed var(--line);border-radius:8px;padding:18px;text-align:center;color:var(--muted);font-size:14px}
@@ -158,6 +158,90 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-body);fon
     <div id="modo"></div>
   </div></header>
   <main><div class="wrap">
+    <section class="panel" id="sec-conexao">
+  <h2>0. Conexão com a IA (só no site)</h2>
+  <p class="sub">Fora do claude.ai a página não tem acesso à sua conta Claude. Para avaliar por aqui, escolha um provedor e informe a sua chave de API. A chave fica só neste navegador: não vai para o GitHub, não entra no processo.json nem no painel exportado. <b>Nesta versão a avaliação por API ainda não está ligada</b>; esta etapa só guarda a escolha.</p>
+  <div class="app-grid">
+    <label>Provedor
+      <select id="ia-provedor" class="app-sel">
+        <option value="">Selecione…</option>
+        <option value="anthropic">Claude (Anthropic)</option>
+        <option value="openai">GPT (OpenAI)</option>
+        <option value="google">Gemini (Google)</option>
+      </select>
+    </label>
+    <label>Modelo
+      <input type="text" id="ia-modelo" list="ia-modelos" autocomplete="off" placeholder="escolha o provedor">
+      <datalist id="ia-modelos"></datalist>
+    </label>
+    <label>Chave de API
+      <input type="password" id="ia-chave" autocomplete="off" spellcheck="false" placeholder="cole a chave aqui">
+    </label>
+  </div>
+  <label class="app-switch"><input type="checkbox" id="ia-lembrar"> Lembrar a chave neste navegador (não marque em computador compartilhado)</label>
+  <div class="row"><a id="ia-link" href="#" target="_blank" rel="noopener" hidden>Onde gerar a chave</a><button type="button" id="ia-esquecer">Esquecer chave</button></div>
+  <div id="ia-status"></div>
+</section>
+<script id="conexao-ia-js">
+"use strict";
+/* Conexão com a IA — existe só no site do GitHub (docs/index.html). O app publicado no claude.ai usa a capability sample e não tem esta seção. */
+(function(){
+  const PROVEDORES = {
+    anthropic: {nome:"Claude (Anthropic)", modelos:["claude-opus-5-5","claude-sonnet-5-5","claude-haiku-4-5-20251001"], padrao:"claude-sonnet-5-5", prefixo:"sk-ant-", link:"https://console.anthropic.com/settings/keys"},
+    openai:    {nome:"GPT (OpenAI)", modelos:[], padrao:"", prefixo:"sk-", link:"https://platform.openai.com/api-keys"},
+    google:    {nome:"Gemini (Google)", modelos:[], padrao:"", prefixo:"", link:"https://aistudio.google.com/app/apikey"}
+  };
+  const KEY = "analise-curriculos-conexao-ia-v1";
+  const $ = s => document.querySelector(s);
+  const estado = {provedor:"", modelo:"", chave:""};   // a chave fica em memória; só vai ao localStorage se "Lembrar" estiver marcado
+
+  function salvar(){
+    try{
+      const lembrar = $("#ia-lembrar").checked;
+      localStorage.setItem(KEY, JSON.stringify({provedor:estado.provedor, modelo:estado.modelo, lembrar, chave: lembrar ? estado.chave : ""}));
+    }catch(e){}
+  }
+  function status(){
+    const p = PROVEDORES[estado.provedor];
+    const el = $("#ia-status");
+    if(!p){ el.innerHTML = ""; return; }
+    const msgs = [];
+    if(!estado.modelo) msgs.push("informe o modelo");
+    if(!estado.chave) msgs.push("cole a chave de API");
+    else if(p.prefixo && !estado.chave.startsWith(p.prefixo)) msgs.push(`a chave não parece ser de ${p.nome} (costuma começar com “${p.prefixo}”)`);
+    el.innerHTML = msgs.length
+      ? `<div class="alertbox warn">Falta: ${msgs.join("; ")}.</div>`
+      : `<div class="alertbox ok">${p.nome} · ${estado.modelo} selecionado. A chave está ${$("#ia-lembrar").checked ? "guardada neste navegador" : "só nesta aba (some ao recarregar)"}.</div>`;
+  }
+  function trocarProvedor(manterModelo){
+    const p = PROVEDORES[estado.provedor];
+    $("#ia-modelos").innerHTML = p ? p.modelos.map(m=>`<option value="${m}">`).join("") : "";
+    $("#ia-modelo").placeholder = !p ? "escolha o provedor" : p.modelos.length ? "escolha ou digite" : "digite o nome do modelo";
+    if(!manterModelo) estado.modelo = p ? p.padrao : "";
+    $("#ia-modelo").value = estado.modelo;
+    const a = $("#ia-link"); a.hidden = !p; if(p) a.href = p.link;
+  }
+
+  try{
+    const s = JSON.parse(localStorage.getItem(KEY) || "null");
+    if(s && PROVEDORES[s.provedor]){ estado.provedor=s.provedor; estado.modelo=s.modelo||""; estado.chave=s.lembrar? (s.chave||"") : ""; $("#ia-lembrar").checked=!!s.lembrar; }
+  }catch(e){}
+  $("#ia-provedor").value = estado.provedor; trocarProvedor(true); $("#ia-chave").value = estado.chave; status();
+
+  $("#ia-provedor").addEventListener("change",e=>{ estado.provedor=e.target.value; trocarProvedor(false); salvar(); status(); });
+  $("#ia-modelo").addEventListener("input",e=>{ estado.modelo=e.target.value.trim(); salvar(); status(); });
+  $("#ia-chave").addEventListener("input",e=>{ estado.chave=e.target.value.trim(); salvar(); status(); });
+  $("#ia-lembrar").addEventListener("change",()=>{ salvar(); status(); });
+  $("#ia-esquecer").addEventListener("click",()=>{ estado.chave=""; $("#ia-chave").value=""; $("#ia-lembrar").checked=false; salvar(); status(); });
+
+  /* Lido pela próxima etapa (chamada à API). Nunca serializar no processo.json. */
+  window.ConexaoIA = {
+    provedores: Object.fromEntries(Object.entries(PROVEDORES).map(([k,v])=>[k,v.nome])),
+    get(){ return {provedor:estado.provedor, modelo:estado.modelo, temChave:!!estado.chave}; },
+    _chave(){ return estado.chave; }
+  };
+})();
+</script>
     <section class="panel" id="sec-vaga">
       <h2>1. Vaga</h2>
       <div class="app-grid">
