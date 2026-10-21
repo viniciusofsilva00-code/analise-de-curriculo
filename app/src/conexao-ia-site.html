@@ -15,8 +15,8 @@
       <input type="text" id="ia-modelo" list="ia-modelos" autocomplete="off" placeholder="escolha o provedor">
       <datalist id="ia-modelos"></datalist>
     </label>
-    <label id="ia-conta-box" hidden>Account ID (Cloudflare)
-      <input type="text" id="ia-conta" autocomplete="off" spellcheck="false" placeholder="ID da conta, no painel da Cloudflare">
+    <label id="ia-conta-box" hidden>URL do Worker (ponte)
+      <input type="text" id="ia-conta" autocomplete="off" spellcheck="false" placeholder="https://seu-worker.sua-conta.workers.dev/">
     </label>
     <label><span id="ia-chave-rotulo">Chave de API</span>
       <input type="password" id="ia-chave" autocomplete="off" spellcheck="false" placeholder="cole a chave aqui">
@@ -34,7 +34,7 @@
     anthropic: {nome:"Claude (Anthropic)", modelos:["claude-opus-5-5","claude-sonnet-5-5","claude-haiku-4-5-20251001"], padrao:"claude-sonnet-5-5", prefixo:"sk-ant-", link:"https://console.anthropic.com/settings/keys"},
     openai:    {nome:"GPT (OpenAI)", modelos:[], padrao:"", prefixo:"sk-", link:"https://platform.openai.com/api-keys"},
     google:    {nome:"Gemini (Google)", modelos:[], padrao:"", prefixo:"", link:"https://aistudio.google.com/app/apikey"},
-    cloudflare:{nome:"Workers AI (Cloudflare)", modelos:[], padrao:"", prefixo:"", link:"https://dash.cloudflare.com/profile/api-tokens", conta:true, rotuloChave:"API token (Workers AI)", dicaModelo:"ex.: @cf/… (nome do modelo no catálogo do Workers AI)"}
+    cloudflare:{nome:"Workers AI (Cloudflare)", modelos:[], padrao:"", prefixo:"", link:"https://dash.cloudflare.com/?to=/:account/workers-and-pages", conta:true, rotuloChave:"Chave de acesso do Worker (CHAVE_ACESSO)", rotuloLink:"Abrir Workers na Cloudflare", dicaModelo:"ex.: @cf/… (nome do modelo no catálogo do Workers AI)"}
   };
   const KEY = "analise-curriculos-conexao-ia-v1";
   const $ = s => document.querySelector(s);
@@ -52,9 +52,9 @@
     if(!p){ el.innerHTML = ""; return; }
     const msgs = [];
     if(!estado.modelo) msgs.push("informe o modelo");
-    if(p.conta && !estado.conta) msgs.push("informe o Account ID");
-    else if(p.conta && !/^[0-9a-f]{32}$/i.test(estado.conta)) msgs.push("o Account ID costuma ter 32 caracteres (0–9, a–f)");
-    if(!estado.chave) msgs.push(p.conta ? "cole o API token" : "cole a chave de API");
+    if(p.conta && !estado.conta) msgs.push("informe a URL do Worker");
+    else if(p.conta && !/^https:\/\/[^\s/]+\.[^\s]+$/i.test(estado.conta)) msgs.push("a URL do Worker deve começar com https://");
+    if(!estado.chave) msgs.push(p.conta ? "cole a chave de acesso do Worker" : "cole a chave de API");
     else if(p.prefixo && !estado.chave.startsWith(p.prefixo)) msgs.push(`a chave não parece ser de ${p.nome} (costuma começar com “${p.prefixo}”)`);
     el.innerHTML = msgs.length
       ? `<div class="alertbox warn">Falta: ${msgs.join("; ")}.</div>`
@@ -68,7 +68,7 @@
     $("#ia-chave-rotulo").textContent = (p && p.rotuloChave) || "Chave de API";
     if(!manterModelo) estado.modelo = p ? p.padrao : "";
     $("#ia-modelo").value = estado.modelo;
-    const a = $("#ia-link"); a.hidden = !p; if(p) a.href = p.link;
+    const a = $("#ia-link"); a.hidden = !p; if(p){ a.href = p.link; a.textContent = p.rotuloLink || "Onde gerar a chave"; }
   }
 
   try{

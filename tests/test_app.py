@@ -211,14 +211,17 @@ def test_conexao_ia_so_no_site(pagina):
     assert "sk-ant-teste-123" not in page.evaluate("localStorage.getItem('analise-curriculos-conexao-ia-v1')")
     page.select_option("#ia-provedor", "google")
     assert page.input_value("#ia-modelo") == ""
-    # Cloudflare pede Account ID + API token
+    # Cloudflare: URL do Worker (ponte) + chave de acesso do Worker
     page.select_option("#ia-provedor", "cloudflare")
-    assert page.is_visible("#ia-conta-box") and page.inner_text("#ia-chave-rotulo") == "API token (Workers AI)"
+    assert page.is_visible("#ia-conta-box") and page.inner_text("#ia-chave-rotulo") == "Chave de acesso do Worker (CHAVE_ACESSO)"
     page.fill("#ia-modelo", "@cf/modelo-teste")
-    page.fill("#ia-conta", "0123456789abcdef0123456789abcdef")
+    page.fill("#ia-conta", "sem-https.exemplo")
+    page.fill("#ia-chave", "token-cf")
+    assert "https://" in page.inner_text("#ia-status")
+    page.fill("#ia-conta", "https://ponte.exemplo.workers.dev/")
     page.fill("#ia-chave", "token-cf")
     assert "selecionado" in page.inner_text("#ia-status")
-    assert page.evaluate("ConexaoIA.get()") == {"provedor": "cloudflare", "modelo": "@cf/modelo-teste", "temChave": True, "conta": "0123456789abcdef0123456789abcdef"}
+    assert page.evaluate("ConexaoIA.get()") == {"provedor": "cloudflare", "modelo": "@cf/modelo-teste", "temChave": True, "conta": "https://ponte.exemplo.workers.dev/"}
     # a chave nunca entra no processo.json exportado
     page.fill("#ia-chave", "chave-secreta-xyz")
     page.fill("#imp-txt", FIXTURE.read_text(encoding="utf-8"))
