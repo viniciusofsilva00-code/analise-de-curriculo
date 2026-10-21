@@ -36,7 +36,14 @@ export default {
         messages: [{ role: "user", content: prompt }],
         max_tokens: 8192, // o padrão do Workers AI é curto demais para a triagem
       });
-      return json({ texto: r.response ?? "" });
+      // cada família de modelo devolve o texto num campo diferente
+      let texto = "";
+      if (typeof r?.response === "string") texto = r.response;
+      else if (r?.response != null) texto = JSON.stringify(r.response);
+      else if (r?.choices?.[0]?.message?.content) texto = r.choices[0].message.content;
+      else if (Array.isArray(r?.output))
+        texto = r.output.flatMap((o) => o.content || []).map((c) => c.text || "").join("");
+      return texto ? json({ texto }) : json({ erro: "resposta sem texto", bruto: r }, 502);
     } catch (e) {
       return json({ erro: String((e && e.message) || e) }, 502);
     }
