@@ -171,3 +171,19 @@ def test_lotes_respeitam_limite(pagina, app_publicado):
     }""")
     assert len(n) >= 3 and all(b < 256 * 1024 for b in n)
     assert pagina.erros == []
+
+
+def test_site_github_pages(pagina):
+    """docs/index.html (GitHub Pages) é o mesmo app com esqueleto e abre em modo de teste."""
+    site = RAIZ / "docs" / "index.html"
+    html = site.read_text(encoding="utf-8")
+    assert html.startswith("<!doctype html>") and APP.read_text(encoding="utf-8") in html
+    assert (RAIZ / "docs" / ".nojekyll").exists()
+    page = pagina.page
+    page.goto(site.as_uri())
+    assert page.evaluate("document.compatMode") == "CSS1Compat"  # sem modo quirks
+    assert "Modo de teste local" in page.inner_text("#modo")
+    page.fill("#imp-txt", FIXTURE.read_text(encoding="utf-8"))
+    page.click("#btn-imp-colar")
+    page.wait_for_selector("#tab-juliana")
+    assert pagina.erros == []

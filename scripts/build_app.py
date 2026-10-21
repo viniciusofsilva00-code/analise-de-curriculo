@@ -17,6 +17,9 @@ from pathlib import Path
 RAIZ = Path(__file__).resolve().parent.parent
 FONTE = RAIZ / "app" / "src" / "app-fonte.html"
 SAIDA = RAIZ / "app" / "analise-curriculos-app.html"
+SITE = RAIZ / "docs" / "index.html"  # GitHub Pages (main, pasta /docs): mesma página com o esqueleto HTML
+ESQUELETO = ('<!doctype html>\n<html lang="pt-BR">\n<head>\n<meta charset="utf-8">\n'
+             '<meta name="viewport" content="width=device-width,initial-scale=1">\n</head>\n<body>\n{}\n</body>\n</html>\n')
 REGRAS = RAIZ / "core" / "regras-avaliacao.md"
 TEMPLATE = RAIZ / "core" / "painel-template.html"
 CDN_OK = ("https://cdnjs.cloudflare.com/", "https://fonts.googleapis.com", "https://fonts.gstatic.com")
@@ -63,10 +66,13 @@ def build() -> Path:
             raise SystemExit(f"script do cdnjs sem versão fixa: {url}")
 
     SAIDA.write_text(out, encoding="utf-8")
+    SITE.parent.mkdir(exist_ok=True)
+    SITE.write_text(ESQUELETO.format(out), encoding="utf-8")
+    (SITE.parent / ".nojekyll").write_text("", encoding="utf-8")  # serve o HTML como está, sem Jekyll
     return SAIDA
 
 
 if __name__ == "__main__":
     p = build()
-    print(f"App gerado: {p.relative_to(RAIZ)} ({p.stat().st_size // 1024} KB)")
+    print(f"App gerado: {p.relative_to(RAIZ)} ({p.stat().st_size // 1024} KB) + {SITE.relative_to(RAIZ)} (GitHub Pages)")
     sys.exit(0)

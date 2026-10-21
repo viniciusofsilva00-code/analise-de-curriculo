@@ -30,6 +30,10 @@ Instalação, uma vez só: `bash scripts/instalar_skill.sh`. O instalador cria u
 
 Teste local: abra `app/analise-curriculos-app.html` no navegador. Sem `claude.use`, a página entra em modo de teste e aceita um `processo.json` importado.
 
+### Site no GitHub Pages
+
+O build também gera `docs/index.html`, que é a mesma página com o cabeçalho HTML completo. No GitHub, abra **Settings → Pages**, escolha "Deploy from a branch", branch `main` e pasta `/docs`. No Pages, o app roda em **modo de teste**: abre um `processo.json` no painel, mas o botão Avaliar só funciona no claude.ai.
+
 ## O que é código e o que é julgamento
 
 - **Código** (determinístico): extração de texto (`extrair_texto.py` no Python; pdf.js e mammoth no app), score, desempate, Top 3, bloqueio, validação (`validar.py`), barreira de privacidade e montagem do painel. O score tem uma implementação só, `PainelSelecao.calc` no template, e um teste confere que o espelho em Python dá o mesmo resultado.
