@@ -1,6 +1,6 @@
 <section class="panel" id="sec-conexao">
   <h2>0. Conexão com a IA (só no site)</h2>
-  <p class="sub">Fora do claude.ai a página não tem acesso à sua conta Claude. Para avaliar por aqui, escolha um provedor e informe a sua chave de API. A chave fica só neste navegador: não vai para o GitHub, não entra no processo.json nem no painel exportado. <b>Nesta versão a avaliação por API ainda não está ligada</b>; esta etapa só guarda a escolha.</p>
+  <p class="sub">Fora do claude.ai a página não tem acesso à sua conta Claude. Para avaliar por aqui, escolha um provedor e informe a sua chave de API. A chave fica só neste navegador e vai direto para o provedor escolhido: não vai para o GitHub, não entra no processo.json nem no painel exportado. Cada clique em Avaliar é uma chamada paga na sua conta do provedor.</p>
   <div class="app-grid">
     <label>Provedor
       <select id="ia-provedor" class="app-sel">
@@ -31,7 +31,7 @@
 /* Conexão com a IA — existe só no site do GitHub (docs/index.html). O app publicado no claude.ai usa a capability sample e não tem esta seção. */
 (function(){
   const PROVEDORES = {
-    anthropic: {nome:"Claude (Anthropic)", modelos:["claude-opus-5-5","claude-sonnet-5-5","claude-haiku-4-5-20251001"], padrao:"claude-sonnet-5-5", prefixo:"sk-ant-", link:"https://console.anthropic.com/settings/keys"},
+    anthropic: {nome:"Claude (Anthropic)", modelos:["claude-opus-5-5","claude-sonnet-5-5","claude-haiku-4-5"], padrao:"claude-opus-5-5", prefixo:"sk-ant-", link:"https://console.anthropic.com/settings/keys"},
     openai:    {nome:"GPT (OpenAI)", modelos:[], padrao:"", prefixo:"sk-", link:"https://platform.openai.com/api-keys"},
     google:    {nome:"Gemini (Google)", modelos:[], padrao:"", prefixo:"", link:"https://aistudio.google.com/app/apikey"},
     cloudflare:{nome:"Workers AI (Cloudflare)", modelos:[], padrao:"", prefixo:"", link:"https://dash.cloudflare.com/?to=/:account/workers-and-pages", conta:true, rotuloChave:"Chave de acesso do Worker (CHAVE_ACESSO)", rotuloLink:"Abrir Workers na Cloudflare", dicaModelo:"ex.: @cf/… (nome do modelo no catálogo do Workers AI)"}
@@ -84,9 +84,105 @@
   $("#ia-lembrar").addEventListener("change",()=>{ salvar(); status(); });
   $("#ia-esquecer").addEventListener("click",()=>{ estado.chave=""; $("#ia-chave").value=""; $("#ia-lembrar").checked=false; salvar(); status(); });
 
-  /* Lido pela próxima etapa (chamada à API). Nunca serializar no processo.json. */
+  /* ---------- chamadas às APIs (mesma interface do sample.json do claude.ai) ---------- */
+  const erro = (code, message, text) => Object.assign({code, message}, text ? {text} : {});
+  function extrairJson(txt){
+    const t = String(txt||"");
+    const cerca = /```(?:json)?\s*([\s\S]*?)```/i.exec(t);
+    const base = cerca ? cerca[1] : t;
+    const i = base.search(/[\[{]/), j = Math.max(base.lastIndexOf("}"), base.lastIndexOf("]"));
+    if(i < 0 || j < i) throw erro("invalid_json", "a resposta não tem JSON", t);
+    try{ return JSON.parse(base.slice(i, j+1)); }catch(e){ throw erro("invalid_json", "JSON incompleto ou inválido", t); }
+  }
+  async function falhaHttp(r, provedor){
+    let corpo = ""; try{ corpo = await r.text(); }catch(e){}
+    const msg = `${provedor} respondeu ${r.status}: ${corpo.slice(0,300)}`;
+    if(r.status===401 || r.status===403) return erro("chave_invalida", msg);
+    if(r.status===429) return erro("rate_limited", msg);
+    if(r.status===413) return erro("prompt_too_large", msg);
+    if(r.status===400 && /context|too long|token/i.test(corpo)) return erro("prompt_too_large", msg);
+    return erro("upstream_error", msg);
+  }
+  async function postar(url, opcoes, signal, provedor){
+    try{ return await fetch(url, Object.assign({method:"POST", signal}, opcoes)); }
+    catch(e){
+      if(e && e.name==="AbortError") throw erro("cancelled","interrompido");
+      throw erro("upstream_error", `não foi possível falar com ${provedor} (${e && e.message || e}). Verifique a rede e a chave.`);
+    }
+  }
+  async function claude(prompt, o){
+    const effort = /haiku/.test(estado.modelo) ? null : "high";
+    const corpo = {model:estado.modelo, max_tokens:64000, stream:true, messages:[{role:"user", content:prompt}]};
+    if(effort) corpo.output_config = {effort};
+    const headers = {"content-type":"application/json", "x-api-key":estado.chave, "anthropic-version":"2023-06-01", "anthropic-dangerous-direct-browser-access":"true"};
+    if(/^claude-(opus|sonnet)-5-5/.test(estado.modelo)){ corpo.fallbacks = "default"; headers["anthropic-beta"] = "server-side-fallback-2026-07-01"; }
+    const r = await postar("https://api.anthropic.com/v1/messages", {headers, body:JSON.stringify(corpo)}, o.signal, "a Anthropic");
+    if(!r.ok) throw await falhaHttp(r, "A Anthropic");
+    // streaming SSE: junta só os deltas de texto (o raciocínio não é mostrado)
+    const leitor = r.body.getReader(), dec = new TextDecoder();
+    let buf = "", texto = "", parada = "";
+    try{
+      for(;;){
+        const {done, value} = await leitor.read(); if(done) break;
+        buf += dec.decode(value, {stream:true});
+        let k;
+        while((k = buf.indexOf("\n\n")) >= 0){
+          const bloco = buf.slice(0,k); buf = buf.slice(k+2);
+          const linha = bloco.split("\n").find(l=>l.startsWith("data:")); if(!linha) continue;
+          let ev; try{ ev = JSON.parse(linha.slice(5)); }catch(e){ continue; }
+          if(ev.type==="content_block_delta" && ev.delta && ev.delta.type==="text_delta"){ texto += ev.delta.text; if(o.onText) o.onText({text:texto, delta:ev.delta.text}); }
+          else if(ev.type==="message_delta" && ev.delta && ev.delta.stop_reason) parada = ev.delta.stop_reason;
+          else if(ev.type==="error") throw erro(ev.error && ev.error.type==="overloaded_error" ? "upstream_error" : "upstream_error", "A Anthropic interrompeu: " + JSON.stringify(ev.error), texto);
+        }
+      }
+    }catch(e){ if(e && e.name==="AbortError") throw erro("cancelled","interrompido"); throw e; }
+    if(parada==="refusal") throw erro("refused","o modelo recusou");
+    if(parada==="max_tokens") throw erro("invalid_json","resposta cortada no limite de tamanho", texto);
+    return texto;
+  }
+  async function gpt(prompt, o){
+    const r = await postar("https://api.openai.com/v1/chat/completions", {headers:{"content-type":"application/json", "authorization":"Bearer "+estado.chave},
+      body:JSON.stringify({model:estado.modelo, messages:[{role:"user", content:prompt}]})}, o.signal, "a OpenAI");
+    if(!r.ok) throw await falhaHttp(r, "A OpenAI");
+    const d = await r.json(); const c = d.choices && d.choices[0];
+    if(c && c.finish_reason==="length") throw erro("invalid_json","resposta cortada no limite de tamanho", c.message && c.message.content);
+    return (c && c.message && c.message.content) || "";
+  }
+  async function gemini(prompt, o){
+    const url = "https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(estado.modelo) + ":generateContent";
+    const r = await postar(url, {headers:{"content-type":"application/json", "x-goog-api-key":estado.chave},
+      body:JSON.stringify({contents:[{role:"user", parts:[{text:prompt}]}], generationConfig:{responseMimeType:"application/json"}})}, o.signal, "o Google");
+    if(!r.ok) throw await falhaHttp(r, "O Google");
+    const d = await r.json(); const c = d.candidates && d.candidates[0];
+    if(!c) throw erro("refused", "o Gemini não devolveu resposta" + (d.promptFeedback ? ": "+JSON.stringify(d.promptFeedback) : ""));
+    if(c.finishReason==="MAX_TOKENS") throw erro("invalid_json","resposta cortada no limite de tamanho");
+    return ((c.content && c.content.parts) || []).map(p=>p.text||"").join("");
+  }
+  async function cloudflare(prompt, o){
+    const r = await postar(estado.conta, {headers:{"content-type":"application/json", "authorization":"Bearer "+estado.chave},
+      body:JSON.stringify({modelo:estado.modelo, prompt})}, o.signal, "o Worker da Cloudflare");
+    let d = null; try{ d = await r.clone().json(); }catch(e){}
+    if(!r.ok){ if(r.status===401 || r.status===403) throw erro("chave_invalida", "o Worker recusou: " + (d && d.erro || r.status)); throw await falhaHttp(r, "O Worker"); }
+    return (d && d.texto) || "";
+  }
+  const CHAMADAS = {anthropic:claude, openai:gpt, google:gemini, cloudflare};
+  function pronto(){
+    const p = PROVEDORES[estado.provedor];
+    return !!(p && estado.modelo && estado.chave && (!p.conta || /^https:\/\//i.test(estado.conta)));
+  }
+
+  /* Nunca serializar no processo.json. */
   window.ConexaoIA = {
     provedores: Object.fromEntries(Object.entries(PROVEDORES).map(([k,v])=>[k,v.nome])),
+    pronto,
+    nome(){ const p=PROVEDORES[estado.provedor]; return p ? `${p.nome} · ${estado.modelo}` : ""; },
+    /** Currículos por chamada: modelos do Workers AI respondem menos texto por vez. */
+    cvsPorLote(){ return estado.provedor==="cloudflare" ? 4 : null; },
+    /** Mesma interface do sample do claude.ai: .json(prompt, {signal, onText}) */
+    adaptador(){
+      if(!pronto()) return null;
+      return { json: async (prompt, o) => extrairJson(await CHAMADAS[estado.provedor](prompt, o||{})) };
+    },
     get(){ const o={provedor:estado.provedor, modelo:estado.modelo, temChave:!!estado.chave}; if(PROVEDORES[estado.provedor]&&PROVEDORES[estado.provedor].conta) o.conta=estado.conta; return o; },
     _chave(){ return estado.chave; }
   };

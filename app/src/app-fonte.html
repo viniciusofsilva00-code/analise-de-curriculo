@@ -134,7 +134,10 @@ function modoManual(motivo){
   $("#btn-avaliar").hidden = true;
   aviso("#modo","warn", motivo + " Você ainda pode abrir um <b>processo.json</b> gerado pela skill <code>/analise-de-curriculo</code> (seção “Abrir um processo.json”, no fim da página).");
 }
-if(!temClaude){
+const temSite = !temClaude && !!window.ConexaoIA;   // site do GitHub: avalia pela API escolhida na seção 0
+if(temSite){
+  aviso("#modo","warn","<b>Site fora do claude.ai.</b> A avaliação usa a API que você escolher na seção 0 (Claude, GPT, Gemini ou Workers AI), com a sua chave. Sem chave, você ainda pode abrir um <b>processo.json</b> no fim da página.");
+}else if(!temClaude){
   modoManual("<b>Modo de teste local.</b> A avaliação automática só funciona com a página publicada no claude.ai.");
 }else{
   $("#btn-avaliar").disabled = true; $("#btn-avaliar").textContent = "Verificando acesso ao Claude…";
@@ -231,9 +234,10 @@ const precisaMatriz = () => !$("#v-req").value.trim() && !textoAnuncio();
 function montarLotes(){
   const cvs = W.arquivos.filter(a=>!a.ehVaga && !a.ignorar && a.legivel);
   const lotes=[]; let atual=[], tam=0;
+  const maxCvs = (temSite && window.ConexaoIA.cvsPorLote()) || Infinity;
   cvs.forEach(a=>{
     const t = bytes(a.texto) + 200;
-    if(atual.length && tam + t > LIMITE_LOTE){ lotes.push(atual); atual=[]; tam=0; }
+    if(atual.length && (tam + t > LIMITE_LOTE || atual.length >= maxCvs)){ lotes.push(atual); atual=[]; tam=0; }
     atual.push(a.id); tam += t;
   });
   if(atual.length) lotes.push(atual);
@@ -328,8 +332,8 @@ function tratarErro(e, repetir){
     if(lote.length>1){ const meio=Math.ceil(lote.length/2); W.lotes.splice(W.loteAtual,1,lote.slice(0,meio),lote.slice(meio)); aviso("#msg","warn",`O lote era grande demais para uma chamada. Dividi em dois: agora são ${W.lotes.length} lotes.`); renderEtapas(); return; }
     aviso("#msg","bad","Um único currículo passa do limite de uma chamada (256 KiB). Remova-o da lista ou reduza o arquivo."); renderEtapas(); return;
   }
-  const textos = {invalid_json:"O Claude respondeu fora do formato JSON esperado.", refused:"O Claude recusou esta etapa com estes dados.", empty_completion:"O Claude não devolveu texto.", session_expired:"Sua sessão expirou: entre de novo no claude.ai.", prompt_too_large:"Os dados desta etapa passam do limite de uma chamada (256 KiB)."};
-  $("#msg").innerHTML = `<div class="alertbox bad">${esc(textos[code]||"Falha temporária na chamada ao Claude.")} <span class="hint">(${esc(code)})</span></div>` + (repetir && code!=="session_expired" ? `<div class="row" style="margin-top:8px"><button type="button" id="btn-repetir">Tentar de novo</button></div>` : "");
+  const textos = {chave_invalida:"O provedor recusou a chave de API (ou o Worker recusou a chave de acesso). Confira a seção 0.", invalid_json:"O Claude respondeu fora do formato JSON esperado.", refused:"O Claude recusou esta etapa com estes dados.", empty_completion:"O Claude não devolveu texto.", session_expired:"Sua sessão expirou: entre de novo no claude.ai.", prompt_too_large:"Os dados desta etapa passam do limite de uma chamada (256 KiB)."};
+  $("#msg").innerHTML = `<div class="alertbox bad">${esc(textos[code]||"Falha temporária na chamada à IA.")} <span class="hint">(${esc(code)})</span>${temSite&&e&&e.message?`<div class="hint">${esc(e.message)}</div>`:""}</div>` + (repetir && code!=="session_expired" ? `<div class="row" style="margin-top:8px"><button type="button" id="btn-repetir">Tentar de novo</button></div>` : "");
   const b=$("#btn-repetir"); if(b) b.onclick=()=>{ aviso("#msg"); repetir(); };
   renderEtapas();
 }
@@ -341,7 +345,8 @@ function renderEtapas(){
   if(precisaMatriz()) passos.push(["matriz","Matriz de critérios (para sua aprovação)"]);
   passos.push(["triagem", W.lotes.length>1 ? `Triagem em ${W.lotes.length} lotes (${W.loteAtual}/${W.lotes.length} feitos)` : "Triagem de todos os currículos"]);
   passos.push(["perguntas","Perguntas de entrevista do Top 3"]);
-  $("#etapas").innerHTML = `Etapas: ${passos.map(([k,t])=>`<b>${esc(t)}</b>`).join(" → ")}. Cada etapa é uma chamada ao Claude disparada pelo seu clique.` + (cvs? ` ${cvs} currículo(s) prontos.`:"");
+  const quem = temSite ? (window.ConexaoIA.nome() || "à IA escolhida na seção 0") : "ao Claude";
+  $("#etapas").innerHTML = `Etapas: ${passos.map(([k,t])=>`<b>${esc(t)}</b>`).join(" → ")}. Cada etapa é uma chamada ${temSite&&window.ConexaoIA.nome()?"a "+esc(quem):esc(quem)} disparada pelo seu clique.` + (cvs? ` ${cvs} currículo(s) prontos.`:"");
   const b = $("#btn-avaliar");
   b.textContent = W.etapa==="inicio" ? "Avaliar" : W.etapa==="matriz" ? "Aprovar matriz e avaliar currículos" : W.etapa==="triagem" ? `Avaliar próximo lote (${W.loteAtual+1} de ${W.lotes.length})` : W.etapa==="perguntas" ? "Gerar perguntas do Top 3" : "Abrir painel";
 }
@@ -350,6 +355,10 @@ $("#btn-avaliar").addEventListener("click",()=>avancar());
 async function avancar(){
   aviso("#msg");
   if(W.etapa==="pronto"){ abrirPainel(W.processo); return; }
+  if(temSite){
+    sampleNs = window.ConexaoIA.adaptador();
+    if(!sampleNs){ aviso("#msg","bad","Complete a seção 0: provedor, modelo e chave de API."); const el=$("#sec-conexao"); if(el) el.scrollIntoView({behavior:"smooth"}); return; }
+  }
   if(!sampleNs){ modoManual("<b>O Claude não está disponível nesta visualização.</b>"); return; }
   if(W.arquivos.some(a=>a.lendo)){ aviso("#msg","warn","Aguarde terminar a leitura dos arquivos."); return; }
   if(W.etapa==="inicio"){
