@@ -182,7 +182,7 @@ def test_site_github_pages(pagina):
     page = pagina.page
     page.goto(site.as_uri())
     assert page.evaluate("document.compatMode") == "CSS1Compat"  # sem modo quirks
-    assert "Site fora do claude.ai" in page.inner_text("#modo")
+    assert "fora do claude.ai" in page.inner_text("#modo")
     assert page.is_visible("#btn-avaliar")
     page.fill("#imp-txt", FIXTURE.read_text(encoding="utf-8"))
     page.click("#btn-imp-colar")
@@ -353,3 +353,15 @@ def test_site_chave_recusada(pagina):
     assert page.is_visible("#btn-avaliar")
     # erro de rede/HTTP no console do navegador é esperado aqui (401); erros de script, não
     assert [e for e in pagina.erros if "401" not in e and "Failed to load resource" not in e] == []
+
+
+def test_site_oferece_plano_claude(pagina):
+    """No site, o caminho principal é o app no claude.ai (plano Claude, sem chave)."""
+    assert "link-plano-claude" not in APP.read_text(encoding="utf-8")
+    page = pagina.page
+    page.goto((RAIZ / "docs" / "index.html").as_uri())
+    link = page.locator("#link-plano-claude")
+    assert link.is_visible()
+    assert link.get_attribute("href").startswith("https://claude.ai/artifact/")
+    assert link.get_attribute("target") == "_blank"
+    assert pagina.erros == []

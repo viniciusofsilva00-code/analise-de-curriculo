@@ -8,7 +8,7 @@
 .painel .app-grid input[type=text],.painel .app-grid input[type=password],.painel .app-field input[type=text],.painel select.app-sel{font:14px var(--f-body);padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);width:100%;min-width:0}
 .painel .app-field textarea{min-height:90px}
 .app-switch{display:flex;gap:8px;align-items:center;font-size:14px;font-weight:600}
-.drop{border:2px dashed var(--line);border-radius:8px;padding:18px;text-align:center;color:var(--muted);font-size:14px}
+.drop{border:2px dashed var(--line);border-radius:var(--r);font-family:var(--f-mono);padding:18px;text-align:center;color:var(--muted);font-size:14px}
 .drop.over{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
 .filelist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:13.5px}
 .filelist li{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;border-bottom:1px solid var(--line);padding:4px 0}
@@ -23,12 +23,13 @@
 #painel-root:empty{display:none}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;600;700&display=swap">
 
 <div id="app" class="painel">
   <header class="top"><div class="wrap">
-    <div class="eyebrow">Triagem de currículos · processo seletivo</div>
-    <h1>Análise de currículos</h1>
+    <div class="vl-brand"><span class="vl-chip" aria-hidden="true">CV</span><span>triagem_cv<span class="vl-cursor" aria-hidden="true"></span></span><span class="vl-endosso">· um projeto vini_lab</span></div>
+    <div class="eyebrow">exp · triagem de currículos e painel de entrevistas</div>
+    <h1>Análise de <span class="vl-marca-texto">currículos</span></h1>
     <p class="sub app-intro">Preencha a vaga, escolha a pasta com os currículos (PDF ou DOCX) e clique em Avaliar. Cada etapa só roda quando você clica. O resultado abre no painel de entrevistas, igual ao da skill <code>/analise-de-curriculo</code>.</p>
     <div id="modo"></div>
   </div></header>
@@ -136,7 +137,7 @@ function modoManual(motivo){
 }
 const temSite = !temClaude && !!window.ConexaoIA;   // site do GitHub: avalia pela API escolhida na seção 0
 if(temSite){
-  aviso("#modo","warn","<b>Site fora do claude.ai.</b> A avaliação usa a API que você escolher na seção 0 (Claude, GPT, Gemini ou Workers AI), com a sua chave. Sem chave, você ainda pode abrir um <b>processo.json</b> no fim da página.");
+  aviso("#modo","warn","<b>Você está no site, fora do claude.ai.</b> Para avaliar sem chave, pelo seu plano Claude, use o botão da seção 0. Aqui no site, a avaliação precisa de uma chave de API. Sem chave, você ainda pode abrir um <b>processo.json</b> no fim da página.");
 }else if(!temClaude){
   modoManual("<b>Modo de teste local.</b> A avaliação automática só funciona com a página publicada no claude.ai.");
 }else{
