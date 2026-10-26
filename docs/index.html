@@ -180,7 +180,11 @@ body ::selection{background:var(--neon);color:#0a0a0a}
   </div></header>
   <main><div class="wrap">
     <section class="panel" id="sec-conexao">
-  <h2>0. Como avaliar</h2>
+  <div class="conexao-topo">
+    <h2>0. Como avaliar</h2>
+    <div id="conexao-resumo" hidden><span class="chip ok" id="conexao-escolha"></span><button type="button" id="conexao-trocar" aria-expanded="false" aria-controls="conexao-corpo">trocar</button></div>
+  </div>
+  <div id="conexao-corpo">
   <p class="sub">As duas primeiras opções usam o seu plano Claude, sem chave de API.</p>
   <div class="plano-claude">
     <div class="plano-claude__txt">
@@ -222,6 +226,7 @@ body ::selection{background:var(--neon);color:#0a0a0a}
   <label class="app-switch"><input type="checkbox" id="ia-lembrar"> Lembrar as chaves neste navegador (não marque em computador compartilhado)</label>
   <div class="row"><a id="ia-link" href="#" target="_blank" rel="noopener" hidden>Onde gerar a chave</a><button type="button" id="ia-esquecer">Esquecer chaves</button></div>
   <div id="ia-status"></div>
+  </div>
   <div id="plano-processos" hidden>
     <div class="row"><button type="button" id="plano-listar">ver meus processos</button><span class="hint">Triagens feitas pelo GitHub. Abrem aqui, sem ficar públicas.</span></div>
     <div id="plano-lista"></div>
@@ -239,6 +244,11 @@ body ::selection{background:var(--neon);color:#0a0a0a}
 .plano-claude--sec{border-color:var(--line);background:var(--surface)}
 .btn-sec{display:inline-flex;align-items:center;font:600 13px/1 var(--f-mono);padding:12px 18px;border-radius:var(--r-btn);border:1px solid var(--line);background:var(--surface);color:var(--fg);text-decoration:none;white-space:nowrap}
 .btn-sec:hover{border-color:var(--neon)}
+.conexao-topo{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between}
+.conexao-topo h2{margin-bottom:0}
+#conexao-resumo:not([hidden]){display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+#conexao-escolha{font:500 12.5px/1.7 var(--f-mono);padding:2px 10px;border-radius:var(--r-tag);background:var(--ok-soft);color:var(--ok);overflow-wrap:anywhere}
+#sec-conexao.recolhida #plano-processos{margin-top:12px}
 #plano-lista ul{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
 #plano-lista li{display:flex;flex-wrap:wrap;gap:8px;align-items:center;border:1px solid var(--line);border-radius:var(--r-btn);padding:8px 10px;background:var(--surface)}
 #plano-lista .pid{font:500 12.5px var(--f-mono);flex:1;min-width:0;overflow-wrap:anywhere}
@@ -258,6 +268,8 @@ body ::selection{background:var(--neon);color:#0a0a0a}
   };
   const KEY = "analise-curriculos-conexao-ia-v1";
   const $ = s => document.querySelector(s);
+  // próprio desta seção: o esc() do app é declarado depois deste script, e a página quebrava ao abrir com a chave lembrada
+  const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
   // valores do provedor atual; cada provedor guarda os seus em modelos/contas/chaves.
   // As chaves ficam em memória e só vão ao localStorage se "Lembrar" estiver marcado.
   const estado = {provedor:"", modelo:"", chave:"", conta:"", modelos:{}, contas:{}, chaves:{}};
@@ -285,6 +297,17 @@ body ::selection{background:var(--neon);color:#0a0a0a}
       ? `<div class="alertbox warn">Falta: ${msgs.join("; ")}.</div>`
       : `<div class="alertbox ok">${p.nome} · ${p.semModelo ? esc(estado.conta) : esc(estado.modelo)} selecionado. A chave está ${$("#ia-lembrar").checked ? "guardada neste navegador" : "só nesta aba (some ao recarregar)"}.</div>`;
   }
+  /* Seção recolhida: depois de escolher o método (e ele estar completo), mostra só o resumo e o botão "trocar". */
+  function recolher(sim){
+    const p = PROVEDORES[estado.provedor];
+    if(sim && !(p && pronto())) sim = false;
+    $("#conexao-corpo").hidden = sim;
+    $("#conexao-resumo").hidden = !sim;
+    $("#sec-conexao").classList.toggle("recolhida", sim);
+    $("#conexao-trocar").setAttribute("aria-expanded", String(!sim));
+    if(sim) $("#conexao-escolha").textContent = p.semModelo ? `${p.nome} · ${estado.conta}` : `${p.nome} · ${estado.modelo}`;
+  }
+  function recolherSePronto(){ if(pronto()) recolher(true); }
   function trocarProvedor(manterModelo){
     const p = PROVEDORES[estado.provedor];
     $("#ia-modelos").innerHTML = p ? p.modelos.map(m=>`<option value="${m}">`).join("") : "";
@@ -313,9 +336,15 @@ body ::selection{background:var(--neon);color:#0a0a0a}
     }
   }catch(e){}
   $("#ia-provedor").value = estado.provedor; trocarProvedor(false); status();
+  recolherSePronto();
 
-  $("#ia-provedor").addEventListener("change",e=>{ sincronizar(); estado.provedor=e.target.value; trocarProvedor(false); salvar(); status(); });
-  $("#usar-plano-github").addEventListener("click",()=>{ sincronizar(); estado.provedor="plano"; $("#ia-provedor").value="plano"; trocarProvedor(false); salvar(); status(); $("#ia-chave").focus(); });
+  $("#ia-provedor").addEventListener("change",e=>{ sincronizar(); estado.provedor=e.target.value; trocarProvedor(false); salvar(); status(); recolherSePronto(); });
+  $("#usar-plano-github").addEventListener("click",()=>{ sincronizar(); estado.provedor="plano"; $("#ia-provedor").value="plano"; trocarProvedor(false); salvar(); status(); if(pronto()) recolher(true); else $("#ia-chave").focus(); });
+  // recolhe quando o usuário sai da seção (clique ou Tab para fora), não a cada tecla nem ao clicar em "Lembrar"
+  const sec = $("#sec-conexao");
+  document.addEventListener("pointerdown", e => { if(!sec.contains(e.target)) recolherSePronto(); });
+  sec.addEventListener("focusout", e => { if(e.relatedTarget && !sec.contains(e.relatedTarget)) recolherSePronto(); });
+  $("#conexao-trocar").addEventListener("click",()=>{ recolher(false); $("#ia-provedor").focus(); });
   $("#ia-modelo").addEventListener("input",e=>{ estado.modelo=e.target.value.trim(); salvar(); status(); });
   $("#ia-conta").addEventListener("input",e=>{ estado.conta=e.target.value.trim(); salvar(); status(); });
   $("#ia-chave").addEventListener("input",e=>{ estado.chave=e.target.value.trim(); salvar(); status(); });
@@ -413,8 +442,18 @@ body ::selection{background:var(--neon);color:#0a0a0a}
   const GH = "https://api.github.com";
   const plano = {intervalo: 15000, limiteMin: 50};
   const repo = () => estado.conta;
+  // 5xx do GitHub costuma ser passageiro (ex.: muitas gravações seguidas na mesma branch): tenta de novo com espera crescente.
+  // Só repete chamadas sem efeito duplicado; abrir o pedido (issue) nunca é repetido.
+  const transitorio = s => s===500 || s===502 || s===503 || s===504;
   async function gh(caminho, op){
     op = op || {};
+    const tentativas = op.tentativas || ((op.method||"GET")==="GET" ? 3 : 1);
+    for(let t=1;; t++){
+      try{ return await gh1(caminho, op); }
+      catch(e){ if(t >= tentativas || !transitorio(e.status)) throw e; await espera(1500 * 2 ** (t-1), op.signal); }
+    }
+  }
+  async function gh1(caminho, op){
     const h = {"Authorization":"Bearer "+estado.chave, "Accept": op.raw ? "application/vnd.github.raw+json" : "application/vnd.github+json", "X-GitHub-Api-Version":"2022-11-28"};
     if(op.body) h["Content-Type"] = "application/json";
     let r;
@@ -466,24 +505,41 @@ body ::selection{background:var(--neon);color:#0a0a0a}
   function pedidosLocais(){ try{ return JSON.parse(localStorage.getItem(PEDIDOS) || "[]"); }catch(e){ return []; } }
   function guardarPedido(p){ try{ const l = pedidosLocais().filter(x=>x.id!==p.id); l.unshift(p); localStorage.setItem(PEDIDOS, JSON.stringify(l.slice(0,30))); }catch(e){} }
 
+  /* Todos os arquivos num commit só (API Git): um commit por arquivo fazia o GitHub devolver 500 no meio do envio. */
+  async function gravarCommit(arquivos, mensagem, branch, signal, onStatus){
+    const itens = [];
+    for(let i=0; i<arquivos.length; i++){
+      onStatus(`enviando ${i+1} de ${arquivos.length}: ${arquivos[i].nome}`);
+      const b = await gh(`/repos/${repo()}/git/blobs`, {method:"POST", signal, tentativas:4, body:{content:arquivos[i].conteudo, encoding:"base64"}});
+      itens.push({path:arquivos[i].caminho, mode:"100644", type:"blob", sha:b.sha});
+    }
+    onStatus("gravando o envio no repositório");
+    const ref = `/repos/${repo()}/git/refs/heads/${encodeURIComponent(branch)}`;
+    for(let t=1;; t++){
+      const pai = (await gh(`/repos/${repo()}/git/ref/heads/${encodeURIComponent(branch)}`, {signal})).object.sha;
+      const base = (await gh(`/repos/${repo()}/git/commits/${pai}`, {signal})).tree.sha;
+      const arvore = await gh(`/repos/${repo()}/git/trees`, {method:"POST", signal, tentativas:3, body:{base_tree:base, tree:itens}});
+      const commit = await gh(`/repos/${repo()}/git/commits`, {method:"POST", signal, tentativas:3, body:{message:mensagem, tree:arvore.sha, parents:[pai]}});
+      try{ await gh(ref, {method:"PATCH", signal, tentativas:3, body:{sha:commit.sha}}); return commit.sha; }
+      catch(e){ if(e.status === 422 && t < 3) continue; throw e; } // a branch andou no meio: refaz sobre a nova ponta
+    }
+  }
+
   plano.enviar = async function({vaga, arquivos, onStatus, signal}){
     onStatus("conferindo o repositório de dados");
     const info = await conferirRepo(signal);
     const lista = arquivos.filter(a => a.file && !a.ignorar);
     if(!lista.some(a => !a.ehVaga)) throw erro("sem_arquivos", "Selecione ao menos um currículo (PDF ou DOCX) antes de enviar.");
     const id = novoId(), base = `entrada/${id}`, usados = new Set();
-    const put = (caminho, conteudo, msg) => gh(`/repos/${repo()}/contents/${caminho.split("/").map(encodeURIComponent).join("/")}`,
-      {method:"PUT", signal, body:{message:msg, content:conteudo, branch:info.default_branch}});
+    const envio = [];
     let anuncio = null;
-    for(let i=0; i<lista.length; i++){
-      const a = lista[i];
+    for(const a of lista){
       let n = nomeSeguro(a.arquivo); while(usados.has(n) || n==="vaga.md") n = "_" + n; usados.add(n);
       if(a.ehVaga) anuncio = n;
-      onStatus(`enviando ${i+1} de ${lista.length}: ${n}`);
-      await put(`${base}/${n}`, b64(await a.file.arrayBuffer()), `triagem ${id}: arquivo ${i+1}`);
+      envio.push({caminho:`${base}/${n}`, nome:n, conteudo:b64(await a.file.arrayBuffer())});
     }
-    onStatus("enviando a vaga");
-    await put(`${base}/vaga.md`, b64(new TextEncoder().encode(vagaMd(vaga, anuncio))), `triagem ${id}: vaga`);
+    envio.push({caminho:`${base}/vaga.md`, nome:"vaga.md", conteudo:b64(new TextEncoder().encode(vagaMd(vaga, anuncio)))});
+    await gravarCommit(envio, `triagem ${id}: ${lista.length} arquivo(s) + vaga`, info.default_branch, signal, onStatus);
     onStatus("abrindo o pedido");
     const desde = new Date(Date.now() - 5000).toISOString();
     const issue = await gh(`/repos/${repo()}/issues`, {method:"POST", signal, body:{

@@ -14,8 +14,12 @@ REPO = "usuario/triagem-cv-dados"
 class GitHubFalso:
     """Simula o pedaço da API do GitHub que o site usa."""
 
-    def __init__(self, privado=True):
+    def __init__(self, privado=True, falhas_blob=0):
         self.privado = privado
+        self.falhas_blob = falhas_blob  # quantos POST de blob respondem 500 antes de aceitar
+        self.blobs = {}
+        self.arvores = {}
+        self.commits = 0
         self.arquivos = {}
         self.label = False
         self.issues = []
@@ -37,9 +41,29 @@ class GitHubFalso:
         if url == f"/repos/{REPO}/labels" and req.method == "POST":
             self.label = True
             return j({"name": "triagem"}, 201)
-        if url.startswith(f"/repos/{REPO}/contents/entrada/") and req.method == "PUT":
-            self.arquivos[url.split("/contents/")[1]] = corpo["content"]
-            return j({"content": {}}, 201)
+        if url == f"/repos/{REPO}/git/blobs" and req.method == "POST":
+            if self.falhas_blob:
+                self.falhas_blob -= 1
+                return j({"message": "Server Error"}, 500)
+            sha = f"blob{len(self.blobs)}"
+            self.blobs[sha] = corpo["content"]
+            return j({"sha": sha}, 201)
+        if url == f"/repos/{REPO}/git/ref/heads/main":
+            return j({"object": {"sha": f"commit{self.commits}"}})
+        if re.fullmatch(rf"/repos/{REPO}/git/commits/commit\d+", url):
+            return j({"tree": {"sha": "arvore-base"}})
+        if url == f"/repos/{REPO}/git/trees" and req.method == "POST":
+            sha = f"arvore{len(self.arvores)}"
+            self.arvores[sha] = corpo["tree"]
+            return j({"sha": sha}, 201)
+        if url == f"/repos/{REPO}/git/commits" and req.method == "POST":
+            self.ultimo_commit = corpo["tree"]
+            return j({"sha": "novo"}, 201)
+        if url == f"/repos/{REPO}/git/refs/heads/main" and req.method == "PATCH":
+            self.commits += 1
+            for item in self.arvores[self.ultimo_commit]:
+                self.arquivos[item["path"]] = self.blobs[item["sha"]]
+            return j({"object": {"sha": corpo["sha"]}})
         if url == f"/repos/{REPO}/issues" and req.method == "POST":
             self.issues.append(corpo)
             return j({"number": 7}, 201)
@@ -86,6 +110,7 @@ def test_plano_via_github_fluxo_completo(pagina):
     pid = caminhos[0].split("/")[1]
     assert re.fullmatch(r"\d{14}-[a-z0-9]{4}", pid)
     assert len(caminhos) == 5 and f"entrada/{pid}/vaga.md" in caminhos
+    assert gh.commits == 1  # tudo num commit só
     import base64
     vaga = base64.b64decode(gh.arquivos[f"entrada/{pid}/vaga.md"]).decode()
     assert "Analista de Recursos Humanos" in vaga and "00_anuncio_vaga_analista_rh.pdf" in vaga
@@ -97,6 +122,40 @@ def test_plano_via_github_fluxo_completo(pagina):
     assert gh.comentarios == ["ajuste: pode pontuar com esta matriz"]
     assert page.evaluate("PainelSelecao.atual().exportar().top3") == json.loads(FIXTURE.read_text())["top3"]
     assert "github_pat_teste" not in json.dumps(page.evaluate("PainelSelecao.atual().exportar()"))
+    assert pagina.erros == []
+
+
+def test_plano_tenta_de_novo_quando_github_da_500(pagina):
+    gh = GitHubFalso(falhas_blob=1)  # o erro "GitHub 500" que aparecia no meio do envio
+    page = pagina.page
+    _preparar(page, gh)
+    page.click("#btn-avaliar")
+    page.wait_for_selector("#plano-resp", timeout=20000)
+    assert len(gh.arquivos) == 5 and gh.commits == 1 and len(gh.issues) == 1
+    assert [e for e in pagina.erros if "status of 500" not in e] == []  # só o 500 simulado, registrado pelo navegador
+
+
+def test_secao_como_avaliar_recolhe_depois_de_escolher(pagina):
+    page = pagina.page
+    page.route("https://api.github.com/**", GitHubFalso())
+    page.goto(SITE.as_uri())
+    assert page.is_visible("#conexao-corpo") and page.is_hidden("#conexao-resumo")
+    page.click("#usar-plano-github")
+    page.fill("#ia-conta", REPO)
+    page.fill("#ia-chave", "github_pat_teste")
+    assert page.is_visible("#conexao-corpo")  # não fecha no meio da digitação
+    page.check("#ia-lembrar")  # clicar dentro da seção não recolhe
+    assert page.is_visible("#conexao-corpo")
+    page.click("#v-cargo")  # sair da seção recolhe
+    page.wait_for_selector("#conexao-resumo", state="visible")
+    assert page.is_hidden("#conexao-corpo")
+    assert REPO in page.inner_text("#conexao-escolha")
+    assert page.is_visible("#plano-listar")  # "ver meus processos" continua à mão
+    page.click("#conexao-trocar")
+    assert page.is_visible("#conexao-corpo") and page.is_hidden("#conexao-resumo")
+    # com a chave lembrada, a página já abre recolhida
+    page.reload()
+    assert page.is_hidden("#conexao-corpo") and page.is_visible("#conexao-resumo")
     assert pagina.erros == []
 
 
