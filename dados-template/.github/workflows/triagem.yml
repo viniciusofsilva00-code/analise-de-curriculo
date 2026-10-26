@@ -1,0 +1,142 @@
+name: triagem
+
+# Repositório de dados PRIVADO do triagem_cv. Os currículos chegam em entrada/<id>/ pelo site,
+# o Claude Code avalia com o seu plano (CLAUDE_CODE_OAUTH_TOKEN) e o resultado vai para resultados/<id>/.
+on:
+  issues:
+    types: [opened]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  issues: write
+  id-token: write
+
+# uma triagem por vez: pedidos simultâneos esperam na fila
+concurrency:
+  group: triagem-cv
+  cancel-in-progress: false
+
+jobs:
+  triar:
+    if: >-
+      contains(github.event.issue.labels.*.name, 'triagem') &&
+      !github.event.issue.pull_request &&
+      (github.event_name == 'issues' || startsWith(github.event.comment.body, 'ajuste'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      ISSUE: ${{ github.event.issue.number }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - name: Conferir que o repositório é privado
+        run: |
+          privado=$(gh api "repos/$GITHUB_REPOSITORY" --jq .private)
+          if [ "$privado" != "true" ]; then
+            echo "Este repositório guarda currículos e precisa ser privado. Nada foi processado." >&2
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # o código do sistema (regras, skill, scripts) vem do repositório público
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.REPO_SISTEMA || 'viniciusofsilva00-code/analise-de-curriculo' }}
+          path: sistema
+
+      - name: Avisar na issue
+        run: |
+          gh issue comment "$ISSUE" --body "<!-- triagem: recebido -->
+          Recebi o pedido. Estou lendo os currículos; leva uns 5 a 15 minutos. Acompanhe aqui: $RUN_URL"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências
+        run: pip install --quiet pypdf python-docx jsonschema
+
+      - name: Preparar pedido
+        id: pedido
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python sistema/scripts/acao_preparar.py
+
+      - name: Avaliar com Claude (plano)
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
+          prompt: |
+            Leia sistema/skill/analise-de-curriculo/SKILL.md inteiro e siga a seção "Modo automático".
+            BASE = sistema/skill/analise-de-curriculo
+            Pasta dos currículos: ${{ steps.pedido.outputs.entrada }}
+            Destino exato do resultado: ${{ steps.pedido.outputs.destino }}
+            Respostas do usuário a perguntas anteriores (pode estar vazio): work/ajustes.md
+          claude_args: >-
+            --model ${{ vars.MODELO_CLAUDE || 'opus' }}
+            --max-turns 80
+            --allowedTools "Read,Write,Edit,Glob,Grep,Bash(sistema/skill/analise-de-curriculo/scripts/rodar.sh:*),Bash(mkdir:*),Bash(ls:*)"
+
+      - name: Ver se ficaram perguntas
+        id: perguntas
+        run: |
+          if [ -s work/perguntas.md ]; then echo "tem=1" >> "$GITHUB_OUTPUT"; else echo "tem=0" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Responder perguntas
+        if: steps.perguntas.outputs.tem == '1'
+        run: |
+          {
+            echo "<!-- triagem: perguntas -->"
+            echo "Antes de pontuar, preciso do seu ok:"
+            echo
+            cat work/perguntas.md
+            echo
+            echo "Responda no site (ou num comentário que comece com **ajuste:**) e eu continuo."
+          } > work/comentario.md
+          gh issue comment "$ISSUE" --body-file work/comentario.md
+
+      - name: Validar e gerar o painel
+        if: steps.perguntas.outputs.tem == '0'
+        env:
+          DESTINO: ${{ steps.pedido.outputs.destino }}
+        run: |
+          test -s "$DESTINO/processo.json" || { echo "O Claude não gravou $DESTINO/processo.json" >&2; exit 1; }
+          python sistema/skill/analise-de-curriculo/scripts/validar.py "$DESTINO/processo.json"
+          python sistema/skill/analise-de-curriculo/scripts/gerar_painel.py "$DESTINO/processo.json"
+          python sistema/skill/analise-de-curriculo/scripts/resumo_triagem.py "$DESTINO/processo.json" > /dev/null
+
+      - name: Commit e push
+        if: steps.perguntas.outputs.tem == '0'
+        env:
+          DESTINO: ${{ steps.pedido.outputs.destino }}
+          ID: ${{ steps.pedido.outputs.id }}
+        run: |
+          git config user.name "triagem_cv"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # só o resultado entra no commit (sistema/ e work/ ficam de fora)
+          git add "$DESTINO"
+          if git diff --cached --quiet; then echo "nada mudou"; exit 0; fi
+          git commit -m "triagem $ID · issue #$ISSUE"
+          for t in 1 2 3; do git push && exit 0; sleep $((t * 5)); git pull --rebase; done
+          exit 1
+
+      - name: Avisar que terminou
+        if: steps.perguntas.outputs.tem == '0'
+        env:
+          ID: ${{ steps.pedido.outputs.id }}
+        run: |
+          gh issue comment "$ISSUE" --body "<!-- triagem: pronto -->
+          Triagem pronta. Abra pelo site do triagem_cv (o painel abre lá, sem ficar público). Para mudar algo, comente começando com **ajuste:**."
+          gh issue edit "$ISSUE" --add-label pronto || true
+
+      - name: Avisar falha
+        if: failure()
+        run: |
+          gh issue comment "$ISSUE" --body "<!-- triagem: falhou -->
+          Algo deu errado na triagem. Veja o registro em $RUN_URL. Para tentar de novo, comente começando com **ajuste:**."

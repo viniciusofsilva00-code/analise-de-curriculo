@@ -63,6 +63,18 @@ A pasta de resultado termina com 3 arquivos: `processo.json`, `painel.html` e `t
 ### 8. Resposta no chat
 Mostre o mesmo resumo do `triagem.md` (tabela de todos os candidatos e, para o Top 3, os pontos fortes, os riscos e as inconsistências). Mostre também os avisos e os limítrofes. Termine com uma linha do que o usuário faz a seguir, por exemplo: "Abra `painel.html`, conduza as entrevistas e registre as respostas. Exporte o JSON para continuar no app."
 
+## Modo automático (GitHub Actions, sem ninguém no chat)
+
+Quando o pedido chega pela Action do repositório de dados (o prompt informa "Pasta dos currículos", "Destino exato" e `work/ajustes.md`):
+
+- Não há ninguém para responder no chat. Nunca pergunte nada na resposta e nunca espere confirmação.
+- Arquivos de trabalho vão em `work/trab/` (crie com `mkdir -p work/trab`), não em `mktemp`. Rode `extrair_texto.py "<pasta>" --saida work/trab`.
+- A vaga está em `vaga.md` dentro da pasta (formulário do site). Se ele citar um arquivo de anúncio, leia também esse anúncio extraído.
+- Leia `work/ajustes.md`: são respostas do usuário a perguntas anteriores ou pedidos de ajuste. Elas valem mais que a vaga.
+- **Matriz sem requisitos**: se a vaga não traz requisitos e `work/ajustes.md` não aprova uma matriz, escreva em `work/perguntas.md` a matriz proposta (tabela com critério, tipo e peso) e a pergunta "Posso pontuar com esta matriz?". Depois pare, sem gravar o resultado.
+- Grave os 3 arquivos **direto no destino informado** (por exemplo, `resultados/<id>/processo.json`), sem a subpasta de data. Os passos 4 a 7 são os mesmos; no 7, `gerar_painel.py` e `resumo_triagem.py` gravam ao lado do `processo.json`.
+- Não faça commit nem push: a Action faz isso depois de validar.
+
 ## Formato do processo.json (resumo)
 
 ```json

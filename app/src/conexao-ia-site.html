@@ -1,37 +1,50 @@
 <section class="panel" id="sec-conexao">
   <h2>0. Como avaliar</h2>
+  <p class="sub">As duas primeiras opções usam o seu plano Claude, sem chave de API.</p>
   <div class="plano-claude">
     <div class="plano-claude__txt">
-      <span class="eyebrow">recomendado · sem chave de API</span>
-      <p><b>Use o seu plano Claude.</b> O mesmo app, publicado no claude.ai, avalia com a sua assinatura: sem chave e sem custo por chamada. Abra pelo botão, entre na sua conta se o claude.ai pedir e siga as mesmas etapas.</p>
+      <span class="eyebrow">recomendado · plano Claude · via GitHub</span>
+      <p><b>Avaliar daqui, pelo GitHub.</b> Funciona como no oficina_ia: o site envia os currículos para o seu repositório privado de dados, o Claude Code avalia lá com o seu plano e o painel abre nesta página. Leva uns 5 a 15 minutos.</p>
     </div>
-    <a class="btn-plano" id="link-plano-claude" href="https://claude.ai/artifact/AtFKSAdDkjFqvMwEQvJ9UL" target="_blank" rel="noopener">avaliar com meu plano Claude →</a>
+    <button type="button" class="btn-plano" id="usar-plano-github">usar meu plano via GitHub</button>
   </div>
-  <p class="sub"><b>Ou use uma chave de API</b> (Claude, GPT, Gemini ou Workers AI). Aqui no site, a página não tem acesso à sua conta Claude: escolha um provedor e informe a chave. A chave fica só neste navegador e vai direto para o provedor escolhido. Ela não vai para o GitHub nem entra no processo.json ou no painel exportado. Cada clique em Avaliar é uma chamada paga na conta do provedor.</p>
+  <div class="plano-claude plano-claude--sec">
+    <div class="plano-claude__txt">
+      <span class="eyebrow">plano Claude · no claude.ai</span>
+      <p><b>Avaliar no claude.ai, na hora.</b> O mesmo app publicado como artifact usa a sua assinatura direto no claude.ai.</p>
+    </div>
+    <a class="btn-sec" id="link-plano-claude" href="https://claude.ai/artifact/AtFKSAdDkjFqvMwEQvJ9UL" target="_blank" rel="noopener">abrir no claude.ai →</a>
+  </div>
+  <p class="sub"><b>Ou use uma chave de API</b> (Claude, GPT, Gemini ou Workers AI). Cada provedor guarda a própria chave, só neste navegador. A chave vai direto para o provedor escolhido e nunca entra no processo.json nem no painel exportado. Cada clique em Avaliar é uma chamada paga na conta do provedor.</p>
   <div class="app-grid">
-    <label>Provedor
+    <label>Como avaliar
       <select id="ia-provedor" class="app-sel">
         <option value="">Selecione…</option>
-        <option value="anthropic">Claude (Anthropic)</option>
-        <option value="openai">GPT (OpenAI)</option>
-        <option value="google">Gemini (Google)</option>
-        <option value="cloudflare">Workers AI (Cloudflare)</option>
+        <option value="plano">Meu plano Claude (via GitHub)</option>
+        <option value="anthropic">API · Claude (Anthropic)</option>
+        <option value="openai">API · GPT (OpenAI)</option>
+        <option value="google">API · Gemini (Google)</option>
+        <option value="cloudflare">API · Workers AI (Cloudflare)</option>
       </select>
     </label>
-    <label>Modelo
+    <label id="ia-modelo-box">Modelo
       <input type="text" id="ia-modelo" list="ia-modelos" autocomplete="off" placeholder="escolha o provedor">
       <datalist id="ia-modelos"></datalist>
     </label>
-    <label id="ia-conta-box" hidden>URL do Worker (ponte)
+    <label id="ia-conta-box" hidden><span id="ia-conta-rotulo">URL do Worker (ponte)</span>
       <input type="text" id="ia-conta" autocomplete="off" spellcheck="false" placeholder="https://seu-worker.sua-conta.workers.dev/">
     </label>
     <label><span id="ia-chave-rotulo">Chave de API</span>
       <input type="password" id="ia-chave" autocomplete="off" spellcheck="false" placeholder="cole a chave aqui">
     </label>
   </div>
-  <label class="app-switch"><input type="checkbox" id="ia-lembrar"> Lembrar a chave neste navegador (não marque em computador compartilhado)</label>
-  <div class="row"><a id="ia-link" href="#" target="_blank" rel="noopener" hidden>Onde gerar a chave</a><button type="button" id="ia-esquecer">Esquecer chave</button></div>
+  <label class="app-switch"><input type="checkbox" id="ia-lembrar"> Lembrar as chaves neste navegador (não marque em computador compartilhado)</label>
+  <div class="row"><a id="ia-link" href="#" target="_blank" rel="noopener" hidden>Onde gerar a chave</a><button type="button" id="ia-esquecer">Esquecer chaves</button></div>
   <div id="ia-status"></div>
+  <div id="plano-processos" hidden>
+    <div class="row"><button type="button" id="plano-listar">ver meus processos</button><span class="hint">Triagens feitas pelo GitHub. Abrem aqui, sem ficar públicas.</span></div>
+    <div id="plano-lista"></div>
+  </div>
 </section>
 <style id="conexao-ia-css">
 .plano-claude{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:center;justify-content:space-between;padding:16px 18px;border:1px solid var(--neon);border-radius:var(--r-btn);background:var(--accent-soft)}
@@ -39,26 +52,42 @@
 .plano-claude__txt p{margin:0}
 .btn-plano{display:inline-flex;align-items:center;font:600 13px/1 var(--f-mono);letter-spacing:-.01em;padding:12px 18px;border-radius:var(--r-btn);background:var(--neon);color:var(--accent-fg);text-decoration:none;white-space:nowrap;transition:box-shadow .12s cubic-bezier(.2,.7,.2,1)}
 .btn-plano:hover{box-shadow:var(--glow)}
-.btn-plano:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn-plano:focus-visible,.btn-sec:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.painel button.btn-plano{border:0;padding:12px 18px;background:var(--neon);color:var(--accent-fg)}
+.painel button.btn-plano:hover{box-shadow:var(--glow)}
+.plano-claude--sec{border-color:var(--line);background:var(--surface)}
+.btn-sec{display:inline-flex;align-items:center;font:600 13px/1 var(--f-mono);padding:12px 18px;border-radius:var(--r-btn);border:1px solid var(--line);background:var(--surface);color:var(--fg);text-decoration:none;white-space:nowrap}
+.btn-sec:hover{border-color:var(--neon)}
+#plano-lista ul{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+#plano-lista li{display:flex;flex-wrap:wrap;gap:8px;align-items:center;border:1px solid var(--line);border-radius:var(--r-btn);padding:8px 10px;background:var(--surface)}
+#plano-lista .pid{font:500 12.5px var(--f-mono);flex:1;min-width:0;overflow-wrap:anywhere}
 </style>
 <script id="conexao-ia-js">
 "use strict";
 /* Conexão com a IA — existe só no site do GitHub (docs/index.html). O app publicado no claude.ai usa a capability sample e não tem esta seção. */
 (function(){
   const PROVEDORES = {
+    plano:     {nome:"Meu plano Claude (via GitHub)", semModelo:true, modelos:[], padrao:"", prefixo:"github_pat_", link:"https://github.com/settings/personal-access-tokens/new", rotuloLink:"Gerar o token no GitHub",
+                conta:true, rotuloConta:"Repositório de dados (privado)", dicaConta:"usuario/triagem-cv-dados", contaPadrao:"viniciusofsilva00-code/triagem-cv-dados", validaConta:/^[\w.-]+\/[\w.-]+$/, avisoConta:"o repositório deve estar no formato usuario/nome",
+                rotuloChave:"Token do GitHub (só o repositório de dados)"},
     anthropic: {nome:"Claude (Anthropic)", modelos:["claude-opus-5-5","claude-sonnet-5-5","claude-haiku-4-5"], padrao:"claude-opus-5-5", prefixo:"sk-ant-", link:"https://console.anthropic.com/settings/keys"},
     openai:    {nome:"GPT (OpenAI)", modelos:[], padrao:"", prefixo:"sk-", link:"https://platform.openai.com/api-keys"},
     google:    {nome:"Gemini (Google)", modelos:[], padrao:"", prefixo:"", link:"https://aistudio.google.com/app/apikey"},
-    cloudflare:{nome:"Workers AI (Cloudflare)", modelos:[], padrao:"", prefixo:"", link:"https://dash.cloudflare.com/?to=/:account/workers-and-pages", conta:true, rotuloChave:"Chave de acesso do Worker (CHAVE_ACESSO)", rotuloLink:"Abrir Workers na Cloudflare", dicaModelo:"ex.: @cf/… (nome do modelo no catálogo do Workers AI)"}
+    cloudflare:{nome:"Workers AI (Cloudflare)", modelos:[], padrao:"", prefixo:"", link:"https://dash.cloudflare.com/?to=/:account/workers-and-pages", conta:true, rotuloConta:"URL do Worker (ponte)", dicaConta:"https://seu-worker.sua-conta.workers.dev/", validaConta:/^https:\/\/[^\s/]+\.[^\s]+$/i, avisoConta:"a URL do Worker deve começar com https://", rotuloChave:"Chave de acesso do Worker (CHAVE_ACESSO)", rotuloLink:"Abrir Workers na Cloudflare", dicaModelo:"ex.: @cf/… (nome do modelo no catálogo do Workers AI)"}
   };
   const KEY = "analise-curriculos-conexao-ia-v1";
   const $ = s => document.querySelector(s);
-  const estado = {provedor:"", modelo:"", chave:"", conta:""};   // a chave fica em memória; só vai ao localStorage se "Lembrar" estiver marcado
+  // valores do provedor atual; cada provedor guarda os seus em modelos/contas/chaves.
+  // As chaves ficam em memória e só vão ao localStorage se "Lembrar" estiver marcado.
+  const estado = {provedor:"", modelo:"", chave:"", conta:"", modelos:{}, contas:{}, chaves:{}};
+  function sincronizar(){ const k=estado.provedor; if(!k) return; estado.modelos[k]=estado.modelo; estado.contas[k]=estado.conta; estado.chaves[k]=estado.chave; }
+  function contaOk(p){ return !p.conta || p.validaConta.test(estado.conta); }
 
   function salvar(){
+    sincronizar();
     try{
       const lembrar = $("#ia-lembrar").checked;
-      localStorage.setItem(KEY, JSON.stringify({provedor:estado.provedor, modelo:estado.modelo, conta:estado.conta, lembrar, chave: lembrar ? estado.chave : ""}));
+      localStorage.setItem(KEY, JSON.stringify({provedor:estado.provedor, modelos:estado.modelos, contas:estado.contas, lembrar, chaves: lembrar ? estado.chaves : {}}));
     }catch(e){}
   }
   function status(){
@@ -66,38 +95,51 @@
     const el = $("#ia-status");
     if(!p){ el.innerHTML = ""; return; }
     const msgs = [];
-    if(!estado.modelo) msgs.push("informe o modelo");
-    if(p.conta && !estado.conta) msgs.push("informe a URL do Worker");
-    else if(p.conta && !/^https:\/\/[^\s/]+\.[^\s]+$/i.test(estado.conta)) msgs.push("a URL do Worker deve começar com https://");
-    if(!estado.chave) msgs.push(p.conta ? "cole a chave de acesso do Worker" : "cole a chave de API");
+    if(!p.semModelo && !estado.modelo) msgs.push("informe o modelo");
+    if(p.conta && !estado.conta) msgs.push(`preencha “${p.rotuloConta}”`);
+    else if(!contaOk(p)) msgs.push(p.avisoConta);
+    if(!estado.chave) msgs.push(`preencha “${p.rotuloChave || "Chave de API"}”`);
     else if(p.prefixo && !estado.chave.startsWith(p.prefixo)) msgs.push(`a chave não parece ser de ${p.nome} (costuma começar com “${p.prefixo}”)`);
     el.innerHTML = msgs.length
       ? `<div class="alertbox warn">Falta: ${msgs.join("; ")}.</div>`
-      : `<div class="alertbox ok">${p.nome} · ${estado.modelo} selecionado. A chave está ${$("#ia-lembrar").checked ? "guardada neste navegador" : "só nesta aba (some ao recarregar)"}.</div>`;
+      : `<div class="alertbox ok">${p.nome} · ${p.semModelo ? esc(estado.conta) : esc(estado.modelo)} selecionado. A chave está ${$("#ia-lembrar").checked ? "guardada neste navegador" : "só nesta aba (some ao recarregar)"}.</div>`;
   }
   function trocarProvedor(manterModelo){
     const p = PROVEDORES[estado.provedor];
     $("#ia-modelos").innerHTML = p ? p.modelos.map(m=>`<option value="${m}">`).join("") : "";
     $("#ia-modelo").placeholder = !p ? "escolha o provedor" : p.dicaModelo || (p.modelos.length ? "escolha ou digite" : "digite o nome do modelo");
     $("#ia-conta-box").hidden = !(p && p.conta);
+    $("#ia-modelo-box").hidden = !!(p && p.semModelo);
+    $("#plano-processos").hidden = estado.provedor !== "plano";
     $("#ia-chave-rotulo").textContent = (p && p.rotuloChave) || "Chave de API";
-    if(!manterModelo) estado.modelo = p ? p.padrao : "";
-    $("#ia-modelo").value = estado.modelo;
+    if(p && p.conta){ $("#ia-conta-rotulo").textContent = p.rotuloConta; $("#ia-conta").placeholder = p.dicaConta; }
+    if(!manterModelo){
+      const k = estado.provedor;
+      estado.modelo = p ? (estado.modelos[k] ?? p.padrao) : "";
+      estado.conta = p ? (estado.contas[k] ?? p.contaPadrao ?? "") : "";
+      estado.chave = p ? (estado.chaves[k] ?? "") : "";
+    }
+    $("#ia-modelo").value = estado.modelo; $("#ia-conta").value = estado.conta; $("#ia-chave").value = estado.chave;
+    try{ if(window.AppAnalise && window.AppAnalise.renderEtapas) window.AppAnalise.renderEtapas(); }catch(e){}
     const a = $("#ia-link"); a.hidden = !p; if(p){ a.href = p.link; a.textContent = p.rotuloLink || "Onde gerar a chave"; }
   }
 
   try{
     const s = JSON.parse(localStorage.getItem(KEY) || "null");
-    if(s && PROVEDORES[s.provedor]){ estado.provedor=s.provedor; estado.modelo=s.modelo||""; estado.chave=s.lembrar? (s.chave||"") : ""; estado.conta=s.conta||""; $("#ia-lembrar").checked=!!s.lembrar; }
+    if(s && PROVEDORES[s.provedor]){
+      estado.provedor=s.provedor; estado.modelos=s.modelos||{}; estado.contas=s.contas||{}; estado.chaves=s.lembrar ? (s.chaves||{}) : {};
+      $("#ia-lembrar").checked=!!s.lembrar;
+    }
   }catch(e){}
-  $("#ia-provedor").value = estado.provedor; trocarProvedor(true); $("#ia-chave").value = estado.chave; $("#ia-conta").value = estado.conta; status();
+  $("#ia-provedor").value = estado.provedor; trocarProvedor(false); status();
 
-  $("#ia-provedor").addEventListener("change",e=>{ estado.provedor=e.target.value; trocarProvedor(false); salvar(); status(); });
+  $("#ia-provedor").addEventListener("change",e=>{ sincronizar(); estado.provedor=e.target.value; trocarProvedor(false); salvar(); status(); });
+  $("#usar-plano-github").addEventListener("click",()=>{ sincronizar(); estado.provedor="plano"; $("#ia-provedor").value="plano"; trocarProvedor(false); salvar(); status(); $("#ia-chave").focus(); });
   $("#ia-modelo").addEventListener("input",e=>{ estado.modelo=e.target.value.trim(); salvar(); status(); });
   $("#ia-conta").addEventListener("input",e=>{ estado.conta=e.target.value.trim(); salvar(); status(); });
   $("#ia-chave").addEventListener("input",e=>{ estado.chave=e.target.value.trim(); salvar(); status(); });
   $("#ia-lembrar").addEventListener("change",()=>{ salvar(); status(); });
-  $("#ia-esquecer").addEventListener("click",()=>{ estado.chave=""; $("#ia-chave").value=""; $("#ia-lembrar").checked=false; salvar(); status(); });
+  $("#ia-esquecer").addEventListener("click",()=>{ estado.chave=""; estado.chaves={}; $("#ia-chave").value=""; $("#ia-lembrar").checked=false; salvar(); status(); });
 
   /* ---------- chamadas às APIs (mesma interface do sample.json do claude.ai) ---------- */
   const erro = (code, message, text) => Object.assign({code, message}, text ? {text} : {});
@@ -183,19 +225,182 @@
   const CHAMADAS = {anthropic:claude, openai:gpt, google:gemini, cloudflare};
   function pronto(){
     const p = PROVEDORES[estado.provedor];
-    return !!(p && estado.modelo && estado.chave && (!p.conta || /^https:\/\//i.test(estado.conta)));
+    return !!(p && (p.semModelo || estado.modelo) && estado.chave && contaOk(p));
   }
+
+  /* ---------- plano Claude via GitHub: repositório de dados privado + GitHub Actions (claude-code-action) ---------- */
+  const GH = "https://api.github.com";
+  const plano = {intervalo: 15000, limiteMin: 50};
+  const repo = () => estado.conta;
+  async function gh(caminho, op){
+    op = op || {};
+    const h = {"Authorization":"Bearer "+estado.chave, "Accept": op.raw ? "application/vnd.github.raw+json" : "application/vnd.github+json", "X-GitHub-Api-Version":"2022-11-28"};
+    if(op.body) h["Content-Type"] = "application/json";
+    let r;
+    try{ r = await fetch(GH+caminho, {method:op.method||"GET", headers:h, body: op.body ? JSON.stringify(op.body) : undefined, cache:"no-store", signal:op.signal}); }
+    catch(e){ if(e && e.name==="AbortError") throw erro("cancelled","interrompido"); throw erro("upstream_error", "não consegui falar com o GitHub ("+(e && e.message || e)+"). Verifique a rede."); }
+    if(op.raw && r.ok) return r.text();
+    let j = null; try{ j = r.status===204 ? null : await r.json(); }catch(e){}
+    if(!r.ok){
+      const m = (j && j.message) || ("erro "+r.status);
+      if(r.status===401) throw erro("chave_invalida", "o GitHub recusou o token ("+m+"). Gere outro e cole na seção 0.");
+      throw Object.assign(erro(r.status===403||r.status===404 ? "sem_permissao" : "upstream_error", "GitHub "+r.status+": "+m), {status:r.status});
+    }
+    return j;
+  }
+  async function conferirRepo(signal){
+    let r;
+    try{ r = await gh(`/repos/${repo()}`, {signal}); }
+    catch(e){ if(e.code==="sem_permissao") throw erro("sem_permissao", `Não encontrei ${repo()} com este token. Confira o nome do repositório e se o token tem acesso a ele.`); throw e; }
+    if(!r.private) throw erro("repo_publico", `${repo()} é público. Currículos têm dados pessoais e só podem ir para um repositório privado. Nada foi enviado.`);
+    if(r.permissions && r.permissions.push === false) throw erro("sem_permissao", "O token não tem permissão de escrita no repositório (Contents: Read and write).");
+    const labels = await gh(`/repos/${repo()}/labels?per_page=100`, {signal});
+    if(!labels.some(l => l.name === "triagem"))
+      await gh(`/repos/${repo()}/labels`, {method:"POST", signal, body:{name:"triagem", color:"ff2bd6", description:"pedido do triagem_cv"}});
+    return r;
+  }
+  function novoId(){
+    const d=new Date(), p=n=>String(n).padStart(2,"0");
+    const sufixo=(Math.random().toString(36).slice(2)+"0000").slice(0,4);
+    return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}-${sufixo}`;
+  }
+  const nomeSeguro = n => (String(n).split("/").pop().normalize("NFKD").replace(/[\u0300-\u036f]/g,"").replace(/[^A-Za-z0-9._-]+/g,"_").slice(-120)) || "arquivo";
+  function b64(buf){ let s=""; const u=new Uint8Array(buf); for(let i=0;i<u.length;i+=0x8000) s+=String.fromCharCode.apply(null, u.subarray(i,i+0x8000)); return btoa(s); }
+  function vagaMd(v, anuncio){
+    const L = [`# Vaga: ${v.titulo || v.cargo}`, ""];
+    [["Cargo",v.cargo],["Empresa",v.empresa],["Área",v.area],["Senioridade",v.senioridade],["Modelo de trabalho",v.modelo],["Local",v.local],["Faixa salarial",v.faixa],["Contrato",v.contrato]]
+      .forEach(([k,x])=>{ if(x) L.push(`- ${k}: ${x}`); });
+    L.push(`- Exige presença física: ${v.exigePresenca ? "sim" : "não"}`);
+    L.push(`- Vaga afirmativa: ${v.afirmativa || "não"}`);
+    if(v.requisitosTexto) L.push("", "## Requisitos informados", "", v.requisitosTexto);
+    if(anuncio) L.push("", "## Anúncio completo", "", `O anúncio está no arquivo \`${anuncio}\` nesta pasta. Leia o texto extraído dele: os requisitos de lá valem junto com os de cima.`);
+    if(!v.requisitosTexto && !anuncio) L.push("", "## Requisitos", "", "Não informados. Proponha a matriz e peça o meu ok antes de pontuar.");
+    return L.join("\n") + "\n";
+  }
+  const espera = (ms, signal) => new Promise((ok, falha) => {
+    const t = setTimeout(ok, ms);
+    if(signal) signal.addEventListener("abort", () => { clearTimeout(t); falha(erro("cancelled","interrompido")); }, {once:true});
+  });
+  const PEDIDOS = "analise-curriculos-pedidos-v1";
+  function pedidosLocais(){ try{ return JSON.parse(localStorage.getItem(PEDIDOS) || "[]"); }catch(e){ return []; } }
+  function guardarPedido(p){ try{ const l = pedidosLocais().filter(x=>x.id!==p.id); l.unshift(p); localStorage.setItem(PEDIDOS, JSON.stringify(l.slice(0,30))); }catch(e){} }
+
+  plano.enviar = async function({vaga, arquivos, onStatus, signal}){
+    onStatus("conferindo o repositório de dados");
+    const info = await conferirRepo(signal);
+    const lista = arquivos.filter(a => a.file && !a.ignorar);
+    if(!lista.some(a => !a.ehVaga)) throw erro("sem_arquivos", "Selecione ao menos um currículo (PDF ou DOCX) antes de enviar.");
+    const id = novoId(), base = `entrada/${id}`, usados = new Set();
+    const put = (caminho, conteudo, msg) => gh(`/repos/${repo()}/contents/${caminho.split("/").map(encodeURIComponent).join("/")}`,
+      {method:"PUT", signal, body:{message:msg, content:conteudo, branch:info.default_branch}});
+    let anuncio = null;
+    for(let i=0; i<lista.length; i++){
+      const a = lista[i];
+      let n = nomeSeguro(a.arquivo); while(usados.has(n) || n==="vaga.md") n = "_" + n; usados.add(n);
+      if(a.ehVaga) anuncio = n;
+      onStatus(`enviando ${i+1} de ${lista.length}: ${n}`);
+      await put(`${base}/${n}`, b64(await a.file.arrayBuffer()), `triagem ${id}: arquivo ${i+1}`);
+    }
+    onStatus("enviando a vaga");
+    await put(`${base}/vaga.md`, b64(new TextEncoder().encode(vagaMd(vaga, anuncio))), `triagem ${id}: vaga`);
+    onStatus("abrindo o pedido");
+    const desde = new Date(Date.now() - 5000).toISOString();
+    const issue = await gh(`/repos/${repo()}/issues`, {method:"POST", signal, body:{
+      title:`triagem · ${vaga.titulo || vaga.cargo} · ${id}`, labels:["triagem"],
+      body:`<!-- triagem-id: ${id} -->\nPedido enviado pelo site do triagem_cv.\n\n- vaga: ${vaga.titulo || vaga.cargo}\n- arquivos: ${lista.length}`}});
+    guardarPedido({id, issue:issue.number, titulo:vaga.titulo || vaga.cargo});
+    return plano.acompanhar({id, issue:issue.number, onStatus, signal, desde});
+  };
+  plano.acompanhar = async function({id, issue, onStatus, signal, desde}){
+    const ini = Date.now(), RE = /<!--\s*triagem:\s*(\w+)\s*-->/;
+    desde = desde || new Date(Date.now() - 5000).toISOString();
+    for(;;){
+      if(Date.now() - ini > plano.limiteMin * 60000) throw erro("demorou", `A triagem está demorando. Ela continua rodando no GitHub; abra depois em “ver meus processos”. Pedido: https://github.com/${repo()}/issues/${issue}`);
+      const coms = await gh(`/repos/${repo()}/issues/${issue}/comments?per_page=100&since=${encodeURIComponent(desde)}`, {signal});
+      const marcas = coms.filter(c => RE.test(c.body || ""));
+      const ult = marcas[marcas.length - 1], m = ult ? RE.exec(ult.body)[1] : "";
+      if(m === "pronto"){
+        onStatus("lendo o resultado");
+        const txt = await gh(`/repos/${repo()}/contents/resultados/${id}/processo.json`, {raw:true, signal});
+        return {tipo:"pronto", processo:JSON.parse(txt), id, issue};
+      }
+      if(m === "perguntas") return {tipo:"perguntas", texto:ult.body.replace(/<!--[\s\S]*?-->/g, "").trim(), id, issue};
+      if(m === "falhou") throw erro("acao_falhou", `A triagem falhou no GitHub. Veja o registro no pedido: https://github.com/${repo()}/issues/${issue}`);
+      const min = Math.floor((Date.now() - ini) / 60000);
+      onStatus(m === "recebido" ? `o Claude está avaliando no GitHub · ${min} min` : `na fila do GitHub Actions · ${min} min`);
+      await espera(plano.intervalo, signal);
+    }
+  };
+  plano.responder = async function({id, issue, texto, onStatus, signal}){
+    const desde = new Date(Date.now() - 5000).toISOString();
+    onStatus("enviando a sua resposta");
+    await gh(`/repos/${repo()}/issues/${issue}/comments`, {method:"POST", signal, body:{body:"ajuste: " + texto}});
+    return plano.acompanhar({id, issue, onStatus, signal, desde});
+  };
+  plano.listar = async function(){
+    let dirs = [];
+    try{ dirs = (await gh(`/repos/${repo()}/contents/resultados`)).filter(x => x.type==="dir").map(x => x.name); }
+    catch(e){ if(e.status!==404) throw e; }
+    const locais = pedidosLocais();
+    const ids = [...new Set(dirs.concat(locais.map(p=>p.id)))].sort().reverse();
+    return ids.map(id => ({id, pronto:dirs.includes(id), pedido:locais.find(p=>p.id===id) || null}));
+  };
+  plano.abrir = async function(id){ return JSON.parse(await gh(`/repos/${repo()}/contents/resultados/${id}/processo.json`, {raw:true})); };
+  plano.apagar = async function(id, onStatus){
+    const info = await gh(`/repos/${repo()}`);
+    for(const pasta of [`entrada/${id}`, `resultados/${id}`]){
+      let itens = [];
+      try{ itens = await gh(`/repos/${repo()}/contents/${pasta}`); }catch(e){ if(e.status!==404) throw e; }
+      for(const it of itens.filter(x=>x.type==="file")){
+        if(onStatus) onStatus(`apagando ${it.path}`);
+        await gh(`/repos/${repo()}/contents/${it.path.split("/").map(encodeURIComponent).join("/")}`, {method:"DELETE", body:{message:`apaga triagem ${id}`, sha:it.sha, branch:info.default_branch}});
+      }
+    }
+    try{ localStorage.setItem(PEDIDOS, JSON.stringify(pedidosLocais().filter(p=>p.id!==id))); }catch(e){}
+  };
+  const quandoId = id => id.replace(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2}).*$/, "$3/$2/$1 $4:$5");
+  async function renderLista(){
+    const el = $("#plano-lista");
+    if(!pronto() || estado.provedor!=="plano"){ el.innerHTML = '<div class="alertbox warn">Complete o repositório e o token acima.</div>'; return; }
+    el.innerHTML = '<p class="hint">carregando…</p>';
+    try{
+      const l = await plano.listar();
+      if(!l.length){ el.innerHTML = '<p class="hint">Nenhum processo ainda. O primeiro aparece aqui depois de Avaliar.</p>'; return; }
+      el.innerHTML = "<ul>" + l.map(x => `<li data-id="${esc(x.id)}"><span class="pid">${esc(quandoId(x.id))} · ${esc(x.pedido ? x.pedido.titulo : x.id)}</span>${x.pronto ? '<span class="chip ok">pronto</span>' : '<span class="chip warn">em andamento</span>'}${x.pronto ? `<button type="button" data-abrir="${esc(x.id)}">abrir</button>` : (x.pedido ? `<button type="button" data-acompanhar="${esc(x.id)}">acompanhar</button>` : "")}<button type="button" data-apagar="${esc(x.id)}">apagar</button></li>`).join("") + "</ul>";
+    }catch(e){ el.innerHTML = `<div class="alertbox bad">${esc(e.message || e)}</div>`; }
+  }
+  $("#plano-listar").addEventListener("click", renderLista);
+  $("#plano-lista").addEventListener("click", async e => {
+    const b = e.target.closest("button"); if(!b) return;
+    const li = b.closest("li"), id = li && li.dataset.id;
+    if(b.dataset.abrir){
+      b.disabled = true; b.textContent = "abrindo…";
+      try{ window.AppAnalise.abrirPainel(await plano.abrir(id)); }catch(x){ b.disabled=false; b.textContent="abrir"; li.insertAdjacentHTML("beforeend", `<div class="alertbox bad">${esc(x.message||x)}</div>`); }
+    }else if(b.dataset.acompanhar){
+      const p = pedidosLocais().find(x=>x.id===id);
+      if(p && window.AppAnalise.acompanharPlano) window.AppAnalise.acompanharPlano(p);
+    }else if(b.dataset.apagar){
+      li.insertAdjacentHTML("beforeend", `<div class="confirm alertbox warn" style="flex-basis:100%">Apagar do repositório os currículos e o resultado deste processo? <button type="button" data-sim="1">apagar</button><button type="button" data-nao="1">cancelar</button></div>`);
+    }else if(b.dataset.nao){ b.closest(".confirm").remove(); }
+    else if(b.dataset.sim){
+      const c = b.closest(".confirm"); c.textContent = "apagando…";
+      try{ await plano.apagar(id, t => { c.textContent = t; }); li.remove(); }
+      catch(x){ c.className = "alertbox bad"; c.textContent = x.message || String(x); }
+    }
+  });
 
   /* Nunca serializar no processo.json. */
   window.ConexaoIA = {
     provedores: Object.fromEntries(Object.entries(PROVEDORES).map(([k,v])=>[k,v.nome])),
     pronto,
-    nome(){ const p=PROVEDORES[estado.provedor]; return p ? `${p.nome} · ${estado.modelo}` : ""; },
+    modo(){ return estado.provedor; },
+    plano,
+    nome(){ const p=PROVEDORES[estado.provedor]; return p ? (p.semModelo ? p.nome : `${p.nome} · ${estado.modelo}`) : ""; },
     /** Currículos por chamada: modelos do Workers AI respondem menos texto por vez. */
     cvsPorLote(){ return estado.provedor==="cloudflare" ? 4 : null; },
     /** Mesma interface do sample do claude.ai: .json(prompt, {signal, onText}) */
     adaptador(){
-      if(!pronto()) return null;
+      if(!pronto() || !CHAMADAS[estado.provedor]) return null;
       return { json: async (prompt, o) => extrairJson(await CHAMADAS[estado.provedor](prompt, o||{})) };
     },
     get(){ const o={provedor:estado.provedor, modelo:estado.modelo, temChave:!!estado.chave}; if(PROVEDORES[estado.provedor]&&PROVEDORES[estado.provedor].conta) o.conta=estado.conta; return o; },

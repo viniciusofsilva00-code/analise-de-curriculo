@@ -30,6 +30,15 @@ Instalação, uma vez só: `bash scripts/instalar_skill.sh`. O instalador cria u
 
 Teste local: abra `app/analise-curriculos-app.html` no navegador. Sem `claude.use`, a página entra em modo de teste e aceita um `processo.json` importado.
 
+### Pelo plano Claude, a partir do site (como no oficina_ia)
+
+O site envia os currículos para um repositório de dados **privado** (`dados-template/` é o conteúdo dele). Lá, o GitHub Actions roda o Claude Code com o seu plano (segredo `CLAUDE_CODE_OAUTH_TOKEN`, gerado por `claude setup-token`), seguindo a seção "Modo automático" da skill. O resultado volta para `resultados/<id>/`, e o site abre o painel lendo-o pela API, com o seu token. Nada de candidato vai para o repositório público nem para o Pages.
+
+Configuração, uma vez só:
+1. Crie o repositório privado `triagem-cv-dados` com o conteúdo de `dados-template/`.
+2. Nele, em Settings → Secrets → Actions, crie `CLAUDE_CODE_OAUTH_TOKEN` (o mesmo valor usado no oficina_ia serve; para gerar outro, rode `claude setup-token`).
+3. Gere um token fine-grained só para esse repositório, com **Contents** e **Issues** em *Read and write*, e cole no site, na seção 0, opção "Meu plano Claude (via GitHub)".
+
 ### Site no GitHub Pages
 
 O build também gera `docs/index.html`, que é a mesma página com o cabeçalho HTML completo. No GitHub, abra **Settings → Pages**, escolha "Deploy from a branch", branch `main` e pasta `/docs`. No Pages, o app roda em **modo de teste**: abre um `processo.json` no painel, mas o botão Avaliar só funciona no claude.ai.

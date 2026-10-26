@@ -827,7 +827,7 @@ async function adicionarArquivos(lista){
     if(ignorado(caminho)) continue;
     const ext = f.name.toLowerCase().split(".").pop();
     if(W.arquivos.some(a=>a.arquivo===caminho)) continue;
-    const item = {id:"", arquivo:caminho, texto:"", legivel:false, motivo:"", ehVaga:false, lendo:true};
+    const item = {id:"", arquivo:caminho, texto:"", legivel:false, motivo:"", ehVaga:false, lendo:true, file:f};
     if(!["pdf","docx"].includes(ext)){ item.lendo=false; item.motivo=`formato .${ext} não suportado (use PDF ou DOCX)`; item.ignorar=true; W.arquivos.push(item); continue; }
     item.ehVaga = ehVagaNome(f.name);
     W.arquivos.push(item); renderArquivos();
@@ -984,6 +984,11 @@ function renderEtapas(){
   if(precisaMatriz()) passos.push(["matriz","Matriz de critérios (para sua aprovação)"]);
   passos.push(["triagem", W.lotes.length>1 ? `Triagem em ${W.lotes.length} lotes (${W.loteAtual}/${W.lotes.length} feitos)` : "Triagem de todos os currículos"]);
   passos.push(["perguntas","Perguntas de entrevista do Top 3"]);
+  if(temSite && window.ConexaoIA.modo()==="plano"){
+    $("#etapas").innerHTML = `Etapas: <b>envio dos arquivos ao seu repositório privado</b> → <b>triagem e perguntas pelo Claude Code, no seu plano</b> → <b>painel aqui</b>. Leva uns 5 a 15 minutos; você pode fechar a página e abrir depois em “ver meus processos”.`;
+    $("#btn-avaliar").textContent = W.etapa==="pronto" ? "Abrir painel" : "Avaliar pelo meu plano (GitHub)";
+    return;
+  }
   const quem = temSite ? (window.ConexaoIA.nome() || "à IA escolhida na seção 0") : "ao Claude";
   $("#etapas").innerHTML = `Etapas: ${passos.map(([k,t])=>`<b>${esc(t)}</b>`).join(" → ")}. Cada etapa é uma chamada ${temSite&&window.ConexaoIA.nome()?"a "+esc(quem):esc(quem)} disparada pelo seu clique.` + (cvs? ` ${cvs} currículo(s) prontos.`:"");
   const b = $("#btn-avaliar");
@@ -994,6 +999,10 @@ $("#btn-avaliar").addEventListener("click",()=>avancar());
 async function avancar(){
   aviso("#msg");
   if(W.etapa==="pronto"){ abrirPainel(W.processo); return; }
+  if(temSite && window.ConexaoIA.modo()==="plano"){
+    if(!window.ConexaoIA.pronto()){ aviso("#msg","bad","Complete a seção 0: repositório de dados e token do GitHub."); const el=$("#sec-conexao"); if(el) el.scrollIntoView({behavior:"smooth"}); return; }
+    return etapaPlano();
+  }
   if(temSite){
     sampleNs = window.ConexaoIA.adaptador();
     if(!sampleNs){ aviso("#msg","bad","Complete a seção 0: provedor, modelo e chave de API."); const el=$("#sec-conexao"); if(el) el.scrollIntoView({behavior:"smooth"}); return; }
@@ -1180,6 +1189,40 @@ async function etapaPerguntas(){
   }catch(e){ tratarErro(e, etapaPerguntas); }
 }
 
+/* ---------------- plano Claude via GitHub (só no site) ---------------- */
+async function etapaPlano(continuar){
+  if(!continuar){
+    const vaga = lerVaga();
+    if(!vaga.cargo){ aviso("#msg","bad","Preencha o cargo da vaga."); $("#v-cargo").focus(); return; }
+    if(W.arquivos.some(a=>a.lendo)){ aviso("#msg","warn","Aguarde terminar a leitura dos arquivos."); return; }
+    if(!W.arquivos.some(a=>!a.ehVaga && !a.ignorar && a.file)){ aviso("#msg","bad","Selecione ao menos um currículo (PDF ou DOCX)."); return; }
+    W.vaga = vaga;
+    continuar = (signal, onStatus) => window.ConexaoIA.plano.enviar({vaga, arquivos:W.arquivos, onStatus, signal});
+  }
+  ctl = new AbortController();
+  $("#run").hidden=false; $("#run-txt").textContent="preparando o envio"; $("#acoes").hidden=true; aviso("#msg"); $("#resultado").innerHTML="";
+  try{ tratarPlano(await continuar(ctl.signal, t => { $("#run-txt").textContent = t; })); }
+  catch(e){
+    if(e && e.code==="cancelled") aviso("#msg","warn","Parei de acompanhar nesta página. Se o pedido já foi aberto, a triagem continua no GitHub: abra depois em “ver meus processos”, na seção 0.");
+    else aviso("#msg","bad", esc((e && e.message) || "Falha ao falar com o GitHub."));
+  }finally{ ctl=null; $("#run").hidden=true; $("#acoes").hidden=false; renderEtapas(); }
+}
+function tratarPlano(r){
+  if(r.tipo==="pronto"){ W.processo=r.processo; W.etapa="pronto"; salvar(); abrirPainel(r.processo); return; }
+  $("#resultado").innerHTML = `<h3>O Claude precisa do seu ok antes de pontuar</h3><div class="alertbox warn" style="white-space:pre-wrap">${esc(r.texto)}</div>
+  <div class="app-field"><label for="plano-resp">Sua resposta</label><textarea id="plano-resp" placeholder="Ex.: pode pontuar com esta matriz. Ou: C4 vale 20 e C9 é desejável."></textarea></div>
+  <div class="row"><button type="button" class="primary" id="plano-enviar-resp">responder e continuar</button></div>`;
+  $("#plano-enviar-resp").onclick = () => {
+    const t = $("#plano-resp").value.trim();
+    if(!t){ aviso("#msg","bad","Escreva a resposta antes de enviar."); return; }
+    etapaPlano((signal, onStatus) => window.ConexaoIA.plano.responder({id:r.id, issue:r.issue, texto:t, onStatus, signal}));
+  };
+}
+function acompanharPlano(p){
+  etapaPlano((signal, onStatus) => window.ConexaoIA.plano.acompanhar({id:p.id, issue:p.issue, onStatus, signal, desde:"2000-01-01T00:00:00Z"}));
+  try{ $("#sec-avaliar").scrollIntoView({behavior:"smooth"}); }catch(e){}
+}
+
 /* ---------------- painel ---------------- */
 function abrirPainel(proc){
   const ok = proc && proc.schemaVersion && proc.vaga && Array.isArray(proc.candidatos) && Array.isArray(proc.criterios);
@@ -1269,5 +1312,5 @@ if(!window.pdfjsLib || !window.mammoth) aviso("#libs-aviso","warn",`Leitor de ${
 renderEtapas();
 
 /* Ganchos para testes automatizados */
-window.AppAnalise = {W, montarPromptMatriz, montarPromptTriagem, montarPromptPerguntas, montarLotes, consolidar, extrairTextoArquivo, adicionarArquivos, abrirPainel, painelHtml, REGRAS_LEN: REGRAS.length};
+window.AppAnalise = {W, renderEtapas, acompanharPlano, montarPromptMatriz, montarPromptTriagem, montarPromptPerguntas, montarLotes, consolidar, extrairTextoArquivo, adicionarArquivos, abrirPainel, painelHtml, REGRAS_LEN: REGRAS.length};
 </script>

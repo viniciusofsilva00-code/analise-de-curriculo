@@ -197,7 +197,7 @@ def test_conexao_ia_so_no_site(pagina):
     page = pagina.page
     page.goto(site.as_uri())
     opcoes = page.eval_on_selector_all("#ia-provedor option", "os => os.map(o => o.value)")
-    assert opcoes == ["", "anthropic", "openai", "google", "cloudflare"]
+    assert opcoes == ["", "plano", "anthropic", "openai", "google", "cloudflare"]
     assert page.is_hidden("#ia-conta-box")
     page.select_option("#ia-provedor", "anthropic")
     assert page.input_value("#ia-modelo") == "claude-opus-5-5"
