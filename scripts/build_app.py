@@ -18,8 +18,9 @@ RAIZ = Path(__file__).resolve().parent.parent
 FONTE = RAIZ / "app" / "src" / "app-fonte.html"
 SAIDA = RAIZ / "app" / "analise-curriculos-app.html"
 SITE = RAIZ / "docs" / "index.html"  # GitHub Pages (main, pasta /docs): mesma página com o esqueleto HTML
+FAVICON = RAIZ / "core" / "favicon" / "links.html"  # ícone v_ da vini_lab (data URI, sem arquivo externo)
 ESQUELETO = ('<!doctype html>\n<html lang="pt-BR">\n<head>\n<meta charset="utf-8">\n'
-             '<meta name="viewport" content="width=device-width,initial-scale=1">\n</head>\n<body>\n{}\n</body>\n</html>\n')
+             '<meta name="viewport" content="width=device-width,initial-scale=1">\n{favicon}</head>\n<body>\n{corpo}\n</body>\n</html>\n')
 REGRAS = RAIZ / "core" / "regras-avaliacao.md"
 TEMPLATE = RAIZ / "core" / "painel-template.html"
 CONEXAO_SITE = RAIZ / "app" / "src" / "conexao-ia-site.html"  # seção de API: só no site do GitHub
@@ -70,7 +71,7 @@ def build() -> Path:
     out = out.replace("<!--SOMENTE_SITE-->", "")  # o app do claude.ai usa a capability sample, sem chave
     SAIDA.write_text(out, encoding="utf-8")
     SITE.parent.mkdir(exist_ok=True)
-    SITE.write_text(ESQUELETO.format(site), encoding="utf-8")
+    SITE.write_text(ESQUELETO.format(favicon=FAVICON.read_text(encoding="utf-8"), corpo=site), encoding="utf-8")
     (SITE.parent / ".nojekyll").write_text("", encoding="utf-8")  # serve o HTML como está, sem Jekyll
     return SAIDA
 

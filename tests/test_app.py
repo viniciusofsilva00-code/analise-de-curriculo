@@ -365,3 +365,14 @@ def test_site_oferece_plano_claude(pagina):
     assert link.get_attribute("href").startswith("https://claude.ai/artifact/")
     assert link.get_attribute("target") == "_blank"
     assert pagina.erros == []
+
+
+def test_favicon_vini_lab(painel_fixture):
+    """Site e painel gerado usam o ícone v_ da vini_lab, embutido (sem arquivo externo)."""
+    site = (RAIZ / "docs" / "index.html").read_text(encoding="utf-8")
+    painel = painel_fixture.read_text(encoding="utf-8")
+    for html in (site, painel):
+        cab = html[: html.index("</head>")]
+        icones = re.findall(r'<link rel="icon"[^>]*href="(data:image/svg\+xml,[^"]+)"', cab)
+        assert len(icones) == 3
+        assert all("%23ff2bd6" in i and ("M5 9 L9 9" in i or "M2.4 4" in i) and "#" not in i for i in icones)  # glifo v_ em neon; "#" codificado
